@@ -8,10 +8,12 @@ class GlobalTypography {
   static TextStyle sub1Regular =
       const TextStyle(fontSize: 16, fontWeight: FontWeight.w400);
 
+  static TextStyle pMedium =
+      const TextStyle(fontSize: 12, fontWeight: FontWeight.w500);
   static TextStyle h1Medium =
-      const TextStyle(fontSize: 24, fontWeight: FontWeight.w600);
+      const TextStyle(fontSize: 24, fontWeight: FontWeight.w500);
   static TextStyle sub1Medium =
-      const TextStyle(fontSize: 16, fontWeight: FontWeight.w600);
+      const TextStyle(fontSize: 16, fontWeight: FontWeight.w500);
 
   static TextStyle h1SemiBold =
       const TextStyle(fontSize: 24, fontWeight: FontWeight.w700);

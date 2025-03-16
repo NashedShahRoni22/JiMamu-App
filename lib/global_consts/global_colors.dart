@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 class GlobalColors {
   static Color white = const Color(0xffffffff);
 
+  static Color secondary = const Color(0xffF6F6F6);
+
   static Color flushMahogany = const Color(0xffC52F30);
 
   static Color balck50 = const Color(0xfff6f6f6);

@@ -5,6 +5,7 @@ import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:jimamu/global_consts/global_colors.dart';
 import 'package:jimamu/global_consts/global_typography.dart';
+import 'package:jimamu/home/view/home_screen.dart';
 
 import '../global_widgets/custom_button.dart';
 
@@ -159,7 +160,9 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                       width: double.infinity,
                       child: CustomButton(
                         text: 'Submit',
-                        function: () {},
+                        function: () {
+                          Navigator.pushNamed(context, HomeScreen.id);
+                        },
                       )),
                 ],
               ),
