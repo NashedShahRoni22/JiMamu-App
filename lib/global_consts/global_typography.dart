@@ -12,6 +12,8 @@ class GlobalTypography {
       const TextStyle(fontSize: 12, fontWeight: FontWeight.w500);
   static TextStyle h1Medium =
       const TextStyle(fontSize: 24, fontWeight: FontWeight.w500);
+  static TextStyle bodyMedium =
+      const TextStyle(fontSize: 14, fontWeight: FontWeight.w500);
   static TextStyle sub1Medium =
       const TextStyle(fontSize: 16, fontWeight: FontWeight.w500);
 
