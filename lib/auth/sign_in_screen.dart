@@ -37,7 +37,7 @@ class SignInScreen extends StatelessWidget {
                 Text(
                   'Enter your mobile number',
                   style: GlobalTypography.sub1Medium
-                      .copyWith(color: GlobalColors.balck800),
+                      .copyWith(color: GlobalColors.black800),
                 ),
                 const SizedBox(
                   height: 16,
@@ -47,12 +47,12 @@ class SignInScreen extends StatelessWidget {
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                         borderSide:
-                            BorderSide(color: GlobalColors.balck100, width: 1),
+                            BorderSide(color: GlobalColors.black100, width: 1),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                         borderSide:
-                            BorderSide(color: GlobalColors.balck100, width: 1),
+                            BorderSide(color: GlobalColors.black100, width: 1),
                       ),
                       hintText: '017XXXXXXXX'),
                 ),
@@ -63,7 +63,7 @@ class SignInScreen extends StatelessWidget {
                   child: Text(
                     'By tapping login, you agree to Terms and Conditions and \nPrivacy of Jimamu.',
                     style: GlobalTypography.pRegular
-                        .copyWith(color: GlobalColors.balck800),
+                        .copyWith(color: GlobalColors.black800),
                     textAlign: TextAlign.center,
                   ),
                 ),

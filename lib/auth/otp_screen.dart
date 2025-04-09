@@ -115,7 +115,7 @@ class _OtpScreenState extends State<OtpScreen> {
                             width: 50,
                             height: 60,
                             decoration: BoxDecoration(
-                              color: GlobalColors.balck50,
+                              color: GlobalColors.black50,
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Center(
@@ -142,7 +142,7 @@ class _OtpScreenState extends State<OtpScreen> {
                     Text(
                       _formatTime(_secondsRemaining),
                       style: GlobalTypography.sub1SemiBold.copyWith(
-                        color: GlobalColors.balck700,
+                        color: GlobalColors.black700,
                       ),
                     ),
                     const SizedBox(height: 40),
@@ -167,7 +167,7 @@ class _OtpScreenState extends State<OtpScreen> {
                             'Resend',
                             style: GlobalTypography.sub1Medium.copyWith(
                               color: _canResend
-                                  ? GlobalColors.balck800
+                                  ? GlobalColors.black800
                                   : Colors.grey,
                             ),
                           ),

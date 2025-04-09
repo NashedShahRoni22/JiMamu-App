@@ -20,6 +20,36 @@ class UpdateProfileScreen extends StatefulWidget {
 class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
   File? _image;
   File? _croppedFile;
+  TextEditingController _dobController = TextEditingController();
+  DateTime? _selectedDate;
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate ?? DateTime(2000),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: GlobalColors.flushMahogany, // selected date background
+              onPrimary: Colors.white, // selected date text
+              onSurface: Colors.black, // default text color
+            ),
+            dialogBackgroundColor: Colors.white, // background of dialog
+          ),
+          child: child!,
+        );
+      },
+    );
+    if (picked != null && picked != _selectedDate) {
+      setState(() {
+        _selectedDate = picked;
+        _dobController.text = "${picked.day}/${picked.month}/${picked.year}";
+      });
+    }
+  }
 
   Future<void> _pickImage() async {
     final ImagePicker picker = ImagePicker();
@@ -124,9 +154,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                               shape: BoxShape.circle,
                               color: Colors.white,
                             ),
-                            child: _image != null
-                                ? Image.file(_image!)
-                                : Image.asset('assets/auth/edit.png'),
+                            child: Image.asset('assets/auth/edit.png'),
                           ),
                           Container(
                             padding: const EdgeInsets.all(10),
@@ -152,7 +180,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                   const SizedBox(height: 16),
                   _buildTextField('Enter Email', 'nashedshah@gmail.com'),
                   const SizedBox(height: 16),
-                  _buildDropdownField('Date of Birth', '30/04/1997'),
+                  _buildDatePickerField('Date of Birth', _dobController),
                   const SizedBox(height: 16),
                   _buildDropdownField('Select Gender', 'Choose an option'),
                   const SizedBox(height: 32),
@@ -173,13 +201,45 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
     );
   }
 
+  Widget _buildDatePickerField(String label, TextEditingController controller) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label,
+            style: GlobalTypography.sub1Medium
+                .copyWith(color: GlobalColors.black700)),
+        const SizedBox(height: 6),
+        GestureDetector(
+          onTap: () => _selectDate(context),
+          child: AbsorbPointer(
+            child: TextField(
+              controller: controller,
+              decoration: InputDecoration(
+                hintText: 'Select Date',
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(color: GlobalColors.black100)),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                suffixIcon: Icon(Icons.calendar_today,
+                    color: GlobalColors.black500, size: 20),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildTextField(String label, String hintText) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label,
             style: GlobalTypography.sub1Medium
-                .copyWith(color: GlobalColors.balck700)),
+                .copyWith(color: GlobalColors.black700)),
         const SizedBox(height: 6),
         TextField(
           decoration: InputDecoration(
@@ -187,7 +247,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
             enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: GlobalColors.balck100)),
+                borderSide: BorderSide(color: GlobalColors.black100)),
             contentPadding:
                 const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
           ),
@@ -202,19 +262,19 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
       children: [
         Text(label,
             style: GlobalTypography.sub1Medium
-                .copyWith(color: GlobalColors.balck700)),
+                .copyWith(color: GlobalColors.black700)),
         const SizedBox(height: 6),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12),
           decoration: BoxDecoration(
-            border: Border.all(color: GlobalColors.balck100),
+            border: Border.all(color: GlobalColors.black100),
             borderRadius: BorderRadius.circular(8),
           ),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String>(
               icon: Icon(
                 Icons.expand_more,
-                color: GlobalColors.balck500,
+                color: GlobalColors.black500,
               ),
               value: null,
               hint: Text(value),
