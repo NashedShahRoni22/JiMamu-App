@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jimamu/home/view/screens/my_orders/view/my_orders.dart';
+import 'package:jimamu/home/view/screens/place_order/view/place_order_screen.dart';
 
 import '../../../global_consts/global_colors.dart';
 import '../../../global_consts/global_typography.dart';
@@ -19,6 +20,8 @@ class ServicesGrid extends StatelessWidget {
           onTap: () {
             if (service['title']! == 'My Orders') {
               Navigator.pushNamed(context, MyOrders.id);
+            } else if (service['title']! == 'Place Order') {
+              Navigator.pushNamed(context, PlaceOrderScreen.id);
             }
           },
           child: SizedBox(

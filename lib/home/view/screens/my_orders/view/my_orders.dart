@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:jimamu/global_consts/global_colors.dart';
 import 'package:jimamu/global_consts/global_typography.dart';
 import 'package:jimamu/home/view/screens/my_orders/view/widgets/order_card.dart';
+import 'package:jimamu/home/view/screens/my_orders/view/screens/order_details/view/order_details_screen.dart';
 
 class MyOrders extends StatefulWidget {
   static const String id = 'MyOrders';
@@ -20,7 +21,6 @@ class _MyOrdersState extends State<MyOrders> {
       appBar: AppBar(
         title: const Text('My Orders'),
         backgroundColor: Colors.white,
-        elevation: 1,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -40,7 +40,9 @@ class _MyOrdersState extends State<MyOrders> {
                         from: '1234 Elm Street Springfield, IL 62701',
                         to: '5678 Maple Avenue Seattle, WA 98101',
                         status: 'Processing',
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.pushNamed(context, OrderDetailsScreen.id);
+                        },
                       ),
                       const SizedBox(height: 12),
                     ],
