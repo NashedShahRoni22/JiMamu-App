@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jimamu/home/view/screens/delivery_requests/view/delivery_requests_screen.dart';
 import 'package:jimamu/home/view/screens/my_orders/view/my_orders.dart';
 import 'package:jimamu/home/view/screens/place_order/view/place_order_screen.dart';
 
@@ -22,6 +23,8 @@ class ServicesGrid extends StatelessWidget {
               Navigator.pushNamed(context, MyOrders.id);
             } else if (service['title']! == 'Place Order') {
               Navigator.pushNamed(context, PlaceOrderScreen.id);
+            } else if (service['title']! == 'Delivery Requests') {
+              Navigator.pushNamed(context, DeliveryRequestsScreen.id);
             }
           },
           child: SizedBox(

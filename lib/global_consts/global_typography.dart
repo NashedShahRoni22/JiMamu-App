@@ -32,6 +32,8 @@ class GlobalTypography {
       const TextStyle(fontSize: 16, fontWeight: FontWeight.w800);
   static TextStyle bodyBold =
       const TextStyle(fontSize: 14, fontWeight: FontWeight.w800);
+  static TextStyle pBold =
+      const TextStyle(fontSize: 12, fontWeight: FontWeight.w800);
 }
 
 

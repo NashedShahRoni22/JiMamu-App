@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:jimamu/auth/otp_screen.dart';
 import 'package:jimamu/auth/update_profile_screen.dart';
 import 'package:jimamu/home/view/home_screen.dart';
+import 'package:jimamu/home/view/screens/delivery_requests/view/delivery_requests_screen.dart';
 import 'package:jimamu/home/view/screens/my_orders/view/my_orders.dart';
 import 'package:jimamu/home/view/screens/my_orders/view/screens/order_details/view/order_details_screen.dart';
 import 'package:jimamu/home/view/screens/place_order/view/place_order_screen.dart';
@@ -37,6 +38,11 @@ Route<dynamic> generateRoute(RouteSettings routeSettings) {
       return MaterialPageRoute(
         settings: routeSettings,
         builder: (_) => const PlaceOrderScreen(),
+      );
+    case DeliveryRequestsScreen.id:
+      return MaterialPageRoute(
+        settings: routeSettings,
+        builder: (_) => const DeliveryRequestsScreen(),
       );
     default:
       return MaterialPageRoute(
