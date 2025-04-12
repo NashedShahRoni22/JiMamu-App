@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jimamu/account/view/account_screen.dart';
 import 'package:jimamu/global_consts/global_colors.dart';
 import 'package:jimamu/global_consts/global_typography.dart';
 import 'package:jimamu/home/view/widgets/banner_indicator.dart';
@@ -65,37 +66,43 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 16),
-              const UserInfoHeader(),
-              const SizedBox(height: 16),
-              const CustomSearchBar(),
-              const SizedBox(height: 24),
-              BannerSlider(
-                bannerImages: _bannerImages,
-                currentIndex: _currentBannerIndex,
-                onPageChanged: (index) => setState(() {
-                  _currentBannerIndex = index;
-                }),
-                height: screenHeight * 0.2,
-              ),
-              const SizedBox(height: 12),
-              BannerIndicator(
-                itemCount: _bannerImages.length,
-                currentIndex: _currentBannerIndex,
-              ),
-              const SizedBox(height: 24),
-              Text('Services', style: GlobalTypography.h1Medium),
-              const SizedBox(height: 24),
-              ServicesGrid(services: _services),
-              const SizedBox(height: 30),
-            ],
-          ),
-        ),
+        child: _selectedTabIndex == 0
+            ? SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 16),
+                    const UserInfoHeader(),
+                    const SizedBox(height: 16),
+                    const CustomSearchBar(),
+                    const SizedBox(height: 24),
+                    BannerSlider(
+                      bannerImages: _bannerImages,
+                      currentIndex: _currentBannerIndex,
+                      onPageChanged: (index) => setState(() {
+                        _currentBannerIndex = index;
+                      }),
+                      height: screenHeight * 0.2,
+                    ),
+                    const SizedBox(height: 12),
+                    BannerIndicator(
+                      itemCount: _bannerImages.length,
+                      currentIndex: _currentBannerIndex,
+                    ),
+                    const SizedBox(height: 24),
+                    Text('Services', style: GlobalTypography.h1Medium),
+                    const SizedBox(height: 24),
+                    ServicesGrid(services: _services),
+                    const SizedBox(height: 30),
+                  ],
+                ),
+              )
+            : _selectedTabIndex == 2
+                ? const ProfileOverviewScreen()
+                : const Center(
+                    child: Text('Build on process..'),
+                  ),
       ),
     );
   }

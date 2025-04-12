@@ -7,6 +7,8 @@ import 'package:jimamu/home/view/screens/my_orders/view/my_orders.dart';
 import 'package:jimamu/home/view/screens/my_orders/view/screens/order_details/view/order_details_screen.dart';
 import 'package:jimamu/home/view/screens/place_order/view/place_order_screen.dart';
 
+import 'account/view/screens/update_profile_screen.dart';
+
 Route<dynamic> generateRoute(RouteSettings routeSettings) {
   switch (routeSettings.name) {
     case OtpScreen.id:
@@ -38,6 +40,11 @@ Route<dynamic> generateRoute(RouteSettings routeSettings) {
       return MaterialPageRoute(
         settings: routeSettings,
         builder: (_) => const PlaceOrderScreen(),
+      );
+    case UpdateProfileScreenAccountsTab.id:
+      return MaterialPageRoute(
+        settings: routeSettings,
+        builder: (_) => const UpdateProfileScreenAccountsTab(),
       );
     case DeliveryRequestsScreen.id:
       return MaterialPageRoute(
