@@ -1,27 +1,91 @@
-import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:jimamu/auth/sign_in_screen.dart';
-import 'package:jimamu/routes.dart';
 
-void main() {
-  runApp(const MyApp());
+import 'package:firebase_app_check/firebase_app_check.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
+import 'package:get/get_navigation/src/root/get_material_app.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/adapters.dart';
+import 'package:jimamu/config/routes.dart';
+import 'package:jimamu/feature/view/auth/switch_login_view.dart';
+import 'config/routing/pages.dart';
+import 'config/theme/custom_material_color.dart';
+import 'constant/color_path.dart';
+import 'constant/local_string.dart';
+import 'feature/controller/theme_controller.dart';
+import 'feature/view/auth/sign_in_screen.dart';
+import 'package:jimamu/feature/model/token.dart' as token;
+
+import 'firebase_options.dart';
+
+
+Future<void> main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  await FirebaseAppCheck.instance.activate(
+    androidProvider: AndroidProvider.debug,
+    appleProvider: AppleProvider.debug,
+  );
+
+  await Hive.initFlutter();
+  await GetStorage.init();
+
+
+  ///////////// Hive Box Initialize //////////////
+
+
+
+  // Token
+  Hive.registerAdapter(token.TokenAdapter());
+  Hive.registerAdapter(token.DataAdapter());
+
+  await Hive.openBox<token.Token>(LocalString.TOKEN_BOX);
+  runApp( MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
+   MyApp({super.key});
+  final ThemeController themeController = Get.put(ThemeController());
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+    return ScreenUtilInit(
+      builder: (context,child) {
+        return Obx(() => GetMaterialApp(
+          debugShowCheckedModeBanner: false,
+          theme:ThemeData(
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: Colors.deepPurple,
+              brightness: Brightness.light,
+            ),
+            useMaterial3: true,
+          ),
+          getPages: Pages.route,
+          // theme: ThemeData(
+          //   colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          //   useMaterial3: true,
+          //   scaffoldBackgroundColor: Colors.white,
+          //   textTheme: GoogleFonts.interTextTheme(),
+          // ),
+          themeMode: themeController.themeMode.value,
+       darkTheme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+        seedColor: Colors.deepPurple,
+          brightness: Brightness.dark,
+        ),
           useMaterial3: true,
-          scaffoldBackgroundColor: Colors.white,
-          textTheme: GoogleFonts.interTextTheme()),
-      onGenerateRoute: (settings) => generateRoute(settings),
-      home: const SignInScreen(),
+        ),
+          onGenerateRoute: (settings) => generateRoute(settings),
+          home: child,
+        ));
+      },
+      // child: const SwitchLoginPage(),
+      child: const SwitchLoginPage(),
     );
   }
 }

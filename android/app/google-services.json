@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "157143478655",
+    "project_id": "jimamuu",
+    "storage_bucket": "jimamuu.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:157143478655:android:5b56fa4eb28cabf58f6a4a",
+        "android_client_info": {
+          "package_name": "com.exapmle.jimamuapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "157143478655-ufhplredifvg1mqta2u14ofcl5ep5phm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.exapmle.jimamuapp",
+            "certificate_hash": "833afa2270652ba54e2781956452e0cc2e55e4b6"
+          }
+        },
+        {
+          "client_id": "157143478655-p2l4h83akrlk8jmevnbhcfi89l2njpme.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC_f7BaJNjedGhiaAvwIKne4VsPHRYCPL8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "157143478655-p2l4h83akrlk8jmevnbhcfi89l2njpme.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "157143478655-ouhe4ul8d0a9linim7nk6hpjp05p3gk7.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.jimamu"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
