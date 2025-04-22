@@ -20,5 +20,6 @@ class ThemeController extends GetxController {
   void toggleReactiveTheme(bool val) {
     isDark.value = val;
     themeMode.value = val ? ThemeMode.dark : ThemeMode.light;
+    box.write('isDark', isDark.value);
   }
 }

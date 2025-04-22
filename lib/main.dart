@@ -66,14 +66,8 @@ class MyApp extends StatelessWidget {
             useMaterial3: true,
           ),
           getPages: Pages.route,
-          // theme: ThemeData(
-          //   colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-          //   useMaterial3: true,
-          //   scaffoldBackgroundColor: Colors.white,
-          //   textTheme: GoogleFonts.interTextTheme(),
-          // ),
           themeMode: themeController.themeMode.value,
-       darkTheme: ThemeData(
+          darkTheme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
         seedColor: Colors.deepPurple,
           brightness: Brightness.dark,
