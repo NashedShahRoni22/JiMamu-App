@@ -19,8 +19,8 @@ class CustomLoading {
           width: width ?? OtherConstant.kDefaultImageHeight,
           // decoration:  const BoxDecoration(image:DecorationImage(image:  AssetImage(AssetPath.logo),scale: 1.5),
           //     shape: BoxShape.circle, color: ColorPath.kGreyWhite),
-          // child: Lottie.asset('assets/icons/loaderThree.json')
-          child: Lottie.asset('assets/icons/loading_animation.json')
+          child: Lottie.asset('assets/icons/jimamu_loader.json')
+          // child: Lottie.asset('assets/icons/loading_animation.json')
       ));
 
 
@@ -38,7 +38,7 @@ class CustomLoading {
                   //     image:  AssetImage(AssetPath.logo),
                   // ),
                   shape: BoxShape.circle, color: ColorPath.kGreyWhite),
-              child:  Lottie.asset('assets/icons/loading_animation.json',
+              child:  Lottie.asset('assets/icons/jimamu_loader.json',
                 width: 150,
                 height: 150,
                 fit: BoxFit.fill,

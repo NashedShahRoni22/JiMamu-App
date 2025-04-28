@@ -5,7 +5,8 @@ class LocalString{
 
   //Hive Box
   static String TOKEN_BOX = 'token_box';
-
+  static String USER_PROFILE_BOX = 'user_profile_box';
+  static String RIDER_PROFILE_BOX = 'rider_profile_box';
 
   /////////////  GetStorage //////////
 

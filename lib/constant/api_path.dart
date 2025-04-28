@@ -12,5 +12,7 @@ class ApiPath{
   /// Update User
   static const String getUserProfileDataUrl = 'user/profile';
   static const String updateUserProfileDataUrl = 'user/profile/update';
+  static const String riderUpdateProfileDataUrl = 'rider/profile/update';
+  static const String getRiderProfileDataUrl = 'rider/profile';
 
 }

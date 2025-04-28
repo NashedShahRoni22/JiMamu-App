@@ -6,5 +6,8 @@ class AllRouters{
   static const String UPDTEPROFILE_PAGE = '/updateProfile';
   static const String HOME_PAGE = '/updateProfile';
   static const String UPDATEACCOUNT_PAGE = '/UpdateProfileScreenAccountsTab';
+  static const String MyOrders_PAGE = '/MyOrders';
+  static const String DELIVERY_REQUEST_PAGE = '/DeliveryRequest';
+  static const String PLACE_ORDER_PAGE = '/PlaceOrder';
 
 }

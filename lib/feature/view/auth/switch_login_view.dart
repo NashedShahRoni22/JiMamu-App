@@ -15,8 +15,6 @@ class SwitchLoginPage extends GetView<AuthController> {
       builder: (_) {
         if (_.isLogging.isTrue) {
 
-          print([_.isUpdateProfile.value,"IsUpdate"]);
-
          if(_.isUpdateProfile.isTrue){
            return const HomeScreen();
          }else{

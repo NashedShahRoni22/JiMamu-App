@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:jimamu/feature/controller/user_controller.dart';
+import 'package:jimamu/feature/view/account/view/screens/update_rider_profile_screen.dart';
 
 import '../../../../../constant/color_path.dart';
 import '../../../../../constant/global_typography.dart';
@@ -6,25 +9,44 @@ import '../screens/delivery_requests/view/delivery_requests_screen.dart';
 import '../screens/my_orders/view/my_orders.dart';
 import '../screens/place_order/view/place_order_screen.dart';
 
-class ServicesGrid extends StatelessWidget {
+class ServicesGrid extends StatefulWidget {
   final List<Map<String, String>> services;
 
   const ServicesGrid({super.key, required this.services});
+
+  @override
+  State<ServicesGrid> createState() => _ServicesGridState();
+}
+
+class _ServicesGridState extends State<ServicesGrid> {
+
+  UserController _userController=Get.put(UserController());
+
+
 
   @override
   Widget build(BuildContext context) {
     return Wrap(
       spacing: 18,
       runSpacing: 18,
-      children: services.map((service) {
+      children: widget.services.map((service) {
         return InkWell(
           onTap: () {
             if (service['title']! == 'My Orders') {
-              Navigator.pushNamed(context, MyOrders.id);
+              Get.to(MyOrders());
             } else if (service['title']! == 'Place Order') {
-              Navigator.pushNamed(context, PlaceOrderScreen.id);
+              Get.to(PlaceOrderScreen());
             } else if (service['title']! == 'Delivery Requests') {
-              Navigator.pushNamed(context, DeliveryRequestsScreen.id);
+              if(_userController.riderProfile.data!.role![0]=='rider'){
+                Get.to(DeliveryRequestsScreen());
+              }else if(_userController.riderProfile.data!.role![0]=='user'){
+                Get.to(UpdateRiderProfileAccount());
+              }else if(service['title']! == 'My Deliveries'){
+
+              }
+
+
+
             }
           },
           child: SizedBox(

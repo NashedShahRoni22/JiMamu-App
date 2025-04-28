@@ -6,21 +6,17 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:jimamu/config/routes.dart';
+import 'package:jimamu/feature/model/user_profile-model.dart' as user;
+import 'package:jimamu/feature/model/update_rider_data_model.dart' as rider;
 import 'package:jimamu/feature/view/auth/switch_login_view.dart';
 import 'config/routing/pages.dart';
-import 'config/theme/custom_material_color.dart';
-import 'constant/color_path.dart';
 import 'constant/local_string.dart';
 import 'feature/controller/theme_controller.dart';
-import 'feature/view/auth/sign_in_screen.dart';
 import 'package:jimamu/feature/model/token.dart' as token;
-
 import 'firebase_options.dart';
-
 
 Future<void> main() async{
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,6 +27,8 @@ Future<void> main() async{
     androidProvider: AndroidProvider.debug,
     appleProvider: AppleProvider.debug,
   );
+
+
 
   await Hive.initFlutter();
   await GetStorage.init();
@@ -44,7 +42,21 @@ Future<void> main() async{
   Hive.registerAdapter(token.TokenAdapter());
   Hive.registerAdapter(token.DataAdapter());
 
+
+  // User
+  Hive.registerAdapter(user.UserProfileDataModelAdapter());
+  Hive.registerAdapter(user.DataAdapter());
+
+  //// Rider
+  Hive.registerAdapter(rider.UpdateRiderDataModelAdapter());
+  Hive.registerAdapter(rider.DataAdapter());
+  Hive.registerAdapter(rider.RiderBankInformationAdapter());
+  Hive.registerAdapter(rider.RiderDocumentAdapter());
+
   await Hive.openBox<token.Token>(LocalString.TOKEN_BOX);
+  await Hive.openBox<user.UserProfileDataModel>(LocalString.USER_PROFILE_BOX);
+  await Hive.openBox<rider.UpdateRiderDataModel>(LocalString.RIDER_PROFILE_BOX);
+
   runApp( MyApp());
 }
 
@@ -66,12 +78,7 @@ class MyApp extends StatelessWidget {
             useMaterial3: true,
           ),
           getPages: Pages.route,
-          // theme: ThemeData(
-          //   colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-          //   useMaterial3: true,
-          //   scaffoldBackgroundColor: Colors.white,
-          //   textTheme: GoogleFonts.interTextTheme(),
-          // ),
+
           themeMode: themeController.themeMode.value,
        darkTheme: ThemeData(
         colorScheme: ColorScheme.fromSeed(

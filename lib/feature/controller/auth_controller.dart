@@ -24,6 +24,7 @@ import '../model/token.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as path;
 
+import '../model/update_rider_data_model.dart';
 import '../view/auth/update_profile_screen.dart';
 class AuthController extends GetxController{
 
@@ -44,6 +45,12 @@ Rx<UserProfileDataModel>userProfileDataModel=Rx(UserProfileDataModel());
 
   // Hive Box
   final Box<Token> tokenBox = Hive.box<Token>(LocalString.TOKEN_BOX);
+  final Box<UserProfileDataModel> userProfileBox = Hive.box<UserProfileDataModel>(LocalString.USER_PROFILE_BOX);
+final Box<UpdateRiderDataModel> riderBox = Hive.box<UpdateRiderDataModel>(LocalString.RIDER_PROFILE_BOX);
+
+UserProfileDataModel get userProfile=>userProfileBox.get('user')??UserProfileDataModel();
+UpdateRiderDataModel get riderProfile=>riderBox.get('rider')??UpdateRiderDataModel();
+
   final box = GetStorage();
   RxBool  isLoadedUserData=RxBool(false);
 
@@ -63,7 +70,6 @@ Rx<UserProfileDataModel>userProfileDataModel=Rx(UserProfileDataModel());
       }
     );
     ApiRequest apiRequest=ApiRequest(url:ApiPath.sendEmailOtpUrl,body: body);
-
     apiRequest.postRequest(isLoadingScreen:false).then((res){
       Get.back();
       if(res!.statusCode==200){
@@ -79,6 +85,7 @@ Rx<UserProfileDataModel>userProfileDataModel=Rx(UserProfileDataModel());
       Fluttertoast.showToast(msg:"Something went wrong");
     });
   }
+
   verifyOtp(){
     CustomLoading.loadingDialog();
     var body=jsonEncode(
@@ -94,11 +101,11 @@ Rx<UserProfileDataModel>userProfileDataModel=Rx(UserProfileDataModel());
         Token token = Token.fromJson(jsonDecode(res.body));
         if(token.success==true){
           tokenBox.put('token', token);
+          getUserProfileData();
           Get.back();
           if(token.data!.status=='active'){
             Get.offAll(HomeScreen());
           }else if(token.data!.status=='pending'){
-            Get.offAll(HomeScreen());
             Get.offAll(UpdateProfileScreen());
           }
 
@@ -116,6 +123,7 @@ Rx<UserProfileDataModel>userProfileDataModel=Rx(UserProfileDataModel());
       Fluttertoast.showToast(msg:"Something went wrong");
     });
   }
+
   Future<bool> handleGoogleSignIn()async{
 
     final user=await GoogleSignIn(
@@ -152,6 +160,7 @@ Rx<UserProfileDataModel>userProfileDataModel=Rx(UserProfileDataModel());
     return FirebaseAuth.instance.currentUser !=null;
 
   }
+
   handleSocialLogin(BuildContext context) async {
      CustomLoading.loadingDialog();
     try {
@@ -159,12 +168,12 @@ Rx<UserProfileDataModel>userProfileDataModel=Rx(UserProfileDataModel());
       var name = userCredential.value?.user?.displayName ?? '';
       var email = userCredential.value?.user?.email ?? '';
       var gender ='male';
-      var dod = '1996-10-25';
+      var dob = '1996-10-25';
       var userType = 'user';
 
       if(peapleApiData !=null || peapleApiData !=''){
         gender = '${peapleApiData['genders'][0]['formattedValue']}';
-        dod = '${peapleApiData['birthdays'][0]['date']['year']}-${peapleApiData['birthdays'][0]['date']['month']}-${peapleApiData['birthdays'][0]['date']['day']}';
+        dob = '${peapleApiData['birthdays'][0]['date']['year']}-${peapleApiData['birthdays'][0]['date']['month']}-${peapleApiData['birthdays'][0]['date']['day']}';
       }
           late File imageFile;
           if (userCredential.value!.user!.photoURL != null && userCredential.value!.user!.photoURL!.isNotEmpty) {
@@ -192,7 +201,7 @@ Rx<UserProfileDataModel>userProfileDataModel=Rx(UserProfileDataModel());
         ..fields['name'] = name
         ..fields['email'] = email
         ..fields['gender'] = gender
-        ..fields['dod'] = dod
+        ..fields['dob'] = dob
         ..fields['user_type'] = userType
         ..files.add(await http.MultipartFile.fromPath('profile_image', imageFile.path));
       final response = await request.send();
@@ -237,7 +246,6 @@ updateUserProfile(BuildContext context) async {
     }
 // Prepare and send request
     final uri = Uri.parse('${ApiPath.baseUrl}${ApiPath.updateUserProfileDataUrl}');
-    print(uri);
     final request = http.MultipartRequest('POST', uri)
       ..fields['name'] = nameController.text
       ..fields['email'] = emailController.text
@@ -256,17 +264,19 @@ updateUserProfile(BuildContext context) async {
       request.files.add(await http.MultipartFile.fromPath('profile_image', imageFile!.path));
     }
 
-    final response = await request.send();
-    Get.back();
-    final responseBody = await response.stream.bytesToString();
-    log(responseBody);
-    print([response.statusCode,"Status code"]);
-    userProfileDataModel.value=UserProfileDataModel.fromJson(jsonDecode(responseBody));
+    var sendRequest = await request.send();
+    var response = await http.Response.fromStream(sendRequest);
+    final responseData = json.decode(response.body);
+    // Assign to model
+    userProfileDataModel.value = UserProfileDataModel.fromJson(responseData);
 
-    // final data = jsonDecode(responseBody);
+    updateUserData();
+
     if (response.statusCode == 200) {
+      userProfileBox.put('user', userProfileDataModel.value);
+      Get.back();
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(userProfileDataModel.value.message ?? "Login success")),
+        SnackBar(content: Text(userProfileDataModel.value.message ?? "Update success")),
       );
       Get.offAll(HomeScreen());
 
@@ -287,20 +297,22 @@ updateUserProfile(BuildContext context) async {
 }
 
 
-  getUserProfileData(){
-    isLoadedUserData.value=true;
-  ApiRequest apiRequest=ApiRequest(url:ApiPath.getUserProfileDataUrl);
-  apiRequest.getRequestWithAuth().then((res){
+getUserProfileData(){
+   isLoadedUserData.value=true;
+   ApiRequest apiRequest=ApiRequest(url:ApiPath.getUserProfileDataUrl);
+   apiRequest.getRequestWithAuth().then((res){
     isLoadedUserData.value=false;
         if(res!.statusCode==200){
+          // log(res.body);
           userProfileDataModel.value=UserProfileDataModel.fromJson(jsonDecode(res.body));
+          userProfileBox.put('user', userProfileDataModel.value);
+          log(jsonEncode(userProfileDataModel.value));
           if(userProfileDataModel.value.data !=null){
             updateUserData();
           }
         }
   }).catchError((e){
     isLoadedUserData.value=false;
-
     print(e.toString());
   });
 }
@@ -308,10 +320,10 @@ updateUserProfile(BuildContext context) async {
  updateUserData() {
  nameController.text = userProfileDataModel.value.data?.name ?? "";
  emailController.text = userProfileDataModel.value.data?.email ?? "";
- dobController.text = userProfileDataModel.value.data?.dod ?? "";
+ dobController.text = userProfileDataModel.value.data?.dob ?? "";
  photoUrlController.text = userProfileDataModel.value.data?.profileImage ?? "";
  phoneController.text = userProfileDataModel.value.data?.phoneNumber??"";
-
+ genderController.text = userProfileDataModel.value.data?.gender??"";
  }
 
   Stream<bool> checkLogging() async* {
@@ -345,11 +357,12 @@ updateUserProfile(BuildContext context) async {
 
   signOut() async {
     await tokenBox.clear();
+    await userProfileBox.clear();
+    await riderBox.clear();
     box.remove('email');
     await signOutFromGoogle();
     Get.offAllNamed(AllRouters.LOGIN_PAGE);
   }
-
 
   Future<void> signOutFromGoogle() async {
     final FirebaseAuth auth = FirebaseAuth.instance;

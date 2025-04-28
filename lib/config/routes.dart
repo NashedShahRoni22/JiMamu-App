@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../feature/view/account/view/screens/update_profile_screen.dart';
+import '../feature/view/account/view/screens/update_rider_profile_screen.dart';
 import '../feature/view/auth/otp_screen.dart';
 import '../feature/view/auth/update_profile_screen.dart';
 import '../feature/view/home/view/home_screen.dart';

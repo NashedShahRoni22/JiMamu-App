@@ -50,6 +50,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
     if (picked != null && picked != _selectedDate) {
       setState(() {
         _selectedDate = picked;
+        print(_selectedDate);
         _auth.dobController.text = "${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}";
 
       });
@@ -98,6 +99,16 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    // _selectedDate= DateTime.parse("2000-01-01");
+    selectedGender = _auth.userProfile.data?.gender.toString()??null;
+    // Example: if you have a saved date from backend/controller
+    if (_auth.dobController.text.isNotEmpty) {
+      try {
+        _selectedDate = DateTime.parse(_auth.dobController.text); // ✅ Parse existing DOB
+      } catch (e) {
+        _selectedDate = DateTime(2000, 1, 1); // fallback
+      }
+    }
 
   }
 
@@ -122,6 +133,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
           },
         ),
       ),
+
       body: GetX<AuthController>(
         init: AuthController(),
         initState: (state) {
@@ -199,11 +211,11 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                     key: _formKey,
                     child: Column(
                       children: [
-                        _buildTextField(label:  'Enter Name',hintText:  'Mr. Nashed Shah',controller:_auth.nameController),
+                        _buildTextField(label:  'Enter Name',hintText:  'Type  name',controller:_auth.nameController),
                         const SizedBox(height: 16),
-                        _buildTextField(label:  'Enter Email',hintText:  'nashedshah@gmail.com',controller: _auth.emailController),
+                        _buildTextField(label:  'Enter Email',hintText:  'Type email',controller: _auth.emailController),
                         const SizedBox(height: 16),
-                        _buildTextField(label:  'Enter Phone Number',hintText:  '017xxxxxxxx',controller: _auth.phoneController),
+                        _buildTextField(label:  'Enter Phone Number',hintText:  'Type phone',controller: _auth.phoneController),
 
                         const SizedBox(height: 16),
                         _buildDatePickerField('Date of Birth', _auth.dobController),

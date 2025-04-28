@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:jimamu/constant/color_path.dart';
+import 'package:jimamu/feature/controller/user_controller.dart';
 import 'package:jimamu/feature/view/home/view/widgets/banner_indicator.dart';
 import 'package:jimamu/feature/view/home/view/widgets/banner_slider.dart';
 import 'package:jimamu/feature/view/home/view/widgets/search_bar.dart';
@@ -18,6 +20,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+
   int _selectedTabIndex = 0;
   int _currentBannerIndex = 0;
 

@@ -3,7 +3,8 @@ import 'package:get/get.dart';
 import 'package:jimamu/feature/controller/auth_controller.dart';
 
 import '../../../controller/theme_controller.dart';
-import 'screens/update_profile_screen.dart';
+import '../../auth/update_profile_screen.dart';
+import 'screens/update_rider_profile_screen.dart';
 
 class ProfileOverviewScreen extends StatefulWidget {
   const ProfileOverviewScreen({super.key});
@@ -82,6 +83,7 @@ class ProfileOverviewScreen extends StatefulWidget {
 
 class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
   final ThemeController themeController = Get.find();
+ final AuthController _auth=Get.put(AuthController());
   @override
   Widget build(BuildContext context) {
 
@@ -110,29 +112,31 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
                 const CircleAvatar(
                   radius: 48,
                   backgroundImage: AssetImage('assets/icons/profile.png'),
+                  // backgroundImage: NetworkImage('${_auth.userProfile.data?.profileImage}'),
                 ),
-                Positioned(
-                  bottom: 4,
-                  right: 1,
-                  child: InkWell(
-                    onTap: () {
-
-                      Get.to(UpdateProfileScreenAccountsTab());
-
-                      // Navigator.pushNamed(
-                      //     context, UpdateProfileScreenAccountsTab.id);
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.grey.shade300),
-                      ),
-                      child: const Icon(Icons.edit, size: 16, color: Colors.black),
-                    ),
-                  ),
-                ),
+                // Positioned(
+                //   bottom: 4,
+                //   right: 1,
+                //   child: InkWell(
+                //     onTap: () {
+                //
+                //       Get.to(UpdateRiderProfileAccount());
+                //       // Get.to(UpdateProfileScreen());
+                //
+                //       // Navigator.pushNamed(
+                //       //     context, UpdateProfileScreenAccountsTab.id);
+                //     },
+                //     child: Container(
+                //       padding: const EdgeInsets.all(6),
+                //       decoration: BoxDecoration(
+                //         color: Colors.white,
+                //         shape: BoxShape.circle,
+                //         border: Border.all(color: Colors.grey.shade300),
+                //       ),
+                //       child: const Icon(Icons.edit, size: 16, color: Colors.black),
+                //     ),
+                //   ),
+                // ),
               ],
             ),
 
@@ -184,20 +188,31 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
               ),
               child: Column(
                 children: [
-                  ProfileOverviewScreen._overviewTile(
-                      Icons.person_outline, "Account"),
+                  GestureDetector(
+
+                    child: ProfileOverviewScreen._overviewTile(
+                        Icons.person_outline, "Customer",
+                    ),
+                    onTap: () {
+                      Get.to(UpdateProfileScreen());
+                    },
+                  ),
+
+                  GestureDetector(
+                    onTap: () {
+                      Get.to(UpdateRiderProfileAccount());
+                    },
+                    child: ProfileOverviewScreen._overviewTile(
+                        Icons.person_outline, "Rider ",
+                    ),
+                  ),
+
+
                   ProfileOverviewScreen._overviewTile(
                       Icons.location_on_outlined, "Address"),
                   ProfileOverviewScreen._overviewTile(
                       Icons.payment, "Payments"),
 
-                  // ProfileOverviewScreen._overviewTile(
-                  //   Icons.brightness_6_outlined,
-                  //   "Theme",
-                  //   isSwitch: true,
-                  //   switchValue: isDarkMode,
-                  //   onSwitchChanged: (val) => _toggleTheme(),
-                  // ),
                   ProfileOverviewScreen._overviewTileWitch(
                     Icons.brightness_6_outlined,
                     "Theme",
