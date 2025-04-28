@@ -109,10 +109,10 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
             Stack(
               alignment: Alignment.bottomRight,
               children: [
-                const CircleAvatar(
+                 CircleAvatar(
                   radius: 48,
-                  backgroundImage: AssetImage('assets/icons/profile.png'),
-                  // backgroundImage: NetworkImage('${_auth.userProfile.data?.profileImage}'),
+                  // backgroundImage: AssetImage('assets/icons/profile.png'),
+                  backgroundImage: NetworkImage('${_auth.userProfile.data?.profileImage}'),
                 ),
                 // Positioned(
                 //   bottom: 4,

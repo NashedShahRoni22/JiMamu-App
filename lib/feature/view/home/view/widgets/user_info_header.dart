@@ -13,6 +13,7 @@ class UserInfoHeader extends StatefulWidget {
 
 class _UserInfoHeaderState extends State<UserInfoHeader> {
   UserController userController=Get.put(UserController());
+  UserController _auth=Get.put(UserController());
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -23,7 +24,12 @@ class _UserInfoHeaderState extends State<UserInfoHeader> {
 
           return Row(
             children: [
-              const CircleAvatar(radius: 24),
+              CircleAvatar(
+                radius: 24,
+                // backgroundImage: AssetImage('assets/icons/profile.png'),
+                backgroundImage: NetworkImage('${_auth.userProfile.data?.profileImage}'),
+              ),
+
               const SizedBox(width: 16),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
