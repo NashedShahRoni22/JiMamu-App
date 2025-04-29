@@ -95,7 +95,7 @@ class _SignInScreenState extends State<SignInScreen> {
                             borderSide:
                             BorderSide(color: ColorPath.black100, width: 1),
                           ),
-                          hintText: 'Type email'),
+                          hintText: 'example@gmail.com'),
                     ),
 
                         const SizedBox(height: 40),

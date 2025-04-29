@@ -8,19 +8,19 @@ import 'package:jimamu/constant/color_path.dart';
 import 'package:jimamu/feature/controller/auth_controller.dart';
 import 'package:jimamu/utils/ui/custom_loading.dart';
 
-import '../../../constant/global_typography.dart';
-import '../../../shared_components/custom_button.dart';
-import '../home/view/home_screen.dart';
+import '../../../../../constant/global_typography.dart';
+import '../../../../../shared_components/custom_button.dart';
+import '../../../home/view/home_screen.dart';
 
-class UpdateProfileScreen extends StatefulWidget {
+class UpdateUserProfileScreen extends StatefulWidget {
   static const String id = 'UpdateProfileScreen';
-  const UpdateProfileScreen({super.key});
+  const UpdateUserProfileScreen({super.key});
 
   @override
-  State<UpdateProfileScreen> createState() => _UpdateProfileScreenState();
+  State<UpdateUserProfileScreen> createState() => _UpdateUserProfileScreenState();
 }
 
-class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
+class _UpdateUserProfileScreenState extends State<UpdateUserProfileScreen> {
   final AuthController _auth=Get.put(AuthController());
   final _formKey = GlobalKey<FormState>();
   // File? _image;
@@ -121,7 +121,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
-            child: Text('Update Profile',
+            child: Text('Customer Profile',
                 style:
                     GlobalTypography.sub1Medium.copyWith(color: Colors.white)),
           )
@@ -172,7 +172,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                               backgroundColor: Colors.white,
                               backgroundImage: _auth.imageFile != null
                                   ? _croppedFile !=null? FileImage(_croppedFile!):const AssetImage('assets/auth/profile.png')
-                                  : const AssetImage('assets/auth/profile.png'),
+                                  :_auth.userProfile.data?.profileImage !=null?NetworkImage(_auth.userProfile.data!.profileImage!):AssetImage('assets/auth/profile.png'),
                             ),
                           ],
                         ),

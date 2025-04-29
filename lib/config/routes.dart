@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../feature/view/account/view/screens/update_rider_profile_screen.dart';
 import '../feature/view/auth/otp_screen.dart';
-import '../feature/view/auth/update_profile_screen.dart';
+import '../feature/view/account/view/screens/update_user_profile_screen.dart';
 import '../feature/view/home/view/home_screen.dart';
 import '../feature/view/home/view/screens/delivery_requests/view/delivery_requests_screen.dart';
 import '../feature/view/home/view/screens/my_orders/view/my_orders.dart';
@@ -15,10 +15,10 @@ Route<dynamic> generateRoute(RouteSettings routeSettings) {
         settings: routeSettings,
         builder: (_) =>  OtpScreen(),
       );
-    case UpdateProfileScreen.id:
+    case UpdateUserProfileScreen.id:
       return MaterialPageRoute(
         settings: routeSettings,
-        builder: (_) => const UpdateProfileScreen(),
+        builder: (_) => const UpdateUserProfileScreen(),
       );
     case HomeScreen.id:
       return MaterialPageRoute(

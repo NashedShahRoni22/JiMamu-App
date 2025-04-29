@@ -4,7 +4,7 @@ import 'package:get/get_navigation/src/routes/get_route.dart';
 import '../../feature/view/account/view/screens/update_rider_profile_screen.dart';
 import '../../feature/view/auth/otp_screen.dart';
 import '../../feature/view/auth/sign_in_screen.dart';
-import '../../feature/view/auth/update_profile_screen.dart';
+import '../../feature/view/account/view/screens/update_user_profile_screen.dart';
 import '../../feature/view/home/view/home_screen.dart';
 import '../../feature/view/home/view/screens/delivery_requests/view/delivery_requests_screen.dart';
 import '../../feature/view/home/view/screens/my_orders/view/my_orders.dart';
@@ -24,7 +24,7 @@ class Pages {
     ),
  GetPage(
       name: AllRouters.UPDTEPROFILE_PAGE,
-      page: () => const UpdateProfileScreen(),
+      page: () => const UpdateUserProfileScreen(),
     ),
  GetPage(
       name: AllRouters.HOME_PAGE,

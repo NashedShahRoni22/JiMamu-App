@@ -127,7 +127,7 @@ class UserController extends GetxController{
     apiRequest.getRequestWithAuth().then((res){
       isLoadedUserData.value=false;
       if(res!.statusCode==200){
-        // log(res.body);
+        log(res.body);
         updateRiderDataModel.value=UpdateRiderDataModel.fromJson(jsonDecode(res.body));
         riderBox.put('rider', updateRiderDataModel.value);
         if(updateRiderDataModel.value.data !=null){

@@ -37,15 +37,13 @@ class _ServicesGridState extends State<ServicesGrid> {
             } else if (service['title']! == 'Place Order') {
               Get.to(PlaceOrderScreen());
             } else if (service['title']! == 'Delivery Requests') {
+
               if(_userController.riderProfile.data!.role![0]=='rider'){
                 Get.to(DeliveryRequestsScreen());
               }else if(_userController.riderProfile.data!.role![0]=='user'){
                 Get.to(UpdateRiderProfileAccount());
               }else if(service['title']! == 'My Deliveries'){
-
               }
-
-
 
             }
           },
@@ -65,7 +63,7 @@ class _ServicesGridState extends State<ServicesGrid> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Image.asset(service['icon']!),
+                  Image.asset(service['icon']!,fit: BoxFit.cover,width: double.infinity,),
                   Padding(
                     padding: const EdgeInsets.all(11),
                     child: Row(

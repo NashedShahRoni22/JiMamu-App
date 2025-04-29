@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:jimamu/feature/controller/user_controller.dart';
 import '../../../../../constant/color_path.dart';
@@ -71,6 +70,21 @@ class _UpdateRiderProfileAccountState extends State<UpdateRiderProfileAccount> {
     }
   }
 
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    if(_userController.riderProfile.data?.riderDocument?.first.documentType=='passport'){
+      selectedDocType='Passport';
+    }else if(_userController.riderProfile.data?.riderDocument?.first.documentType=='nid'){
+      selectedDocType='ID Card';
+    }else if(_userController.riderProfile.data?.riderDocument?.first.documentType=='driving_licence'){
+      selectedDocType='Driver License';
+    }
+
+  }
+
 
   @override
   void dispose() {
@@ -91,7 +105,7 @@ class _UpdateRiderProfileAccountState extends State<UpdateRiderProfileAccount> {
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
-            child: Text('Update Profile',
+            child: Text('Rider Profile',
                 style:
                     GlobalTypography.sub1Medium.copyWith(color: Colors.white)),
           )
@@ -249,136 +263,152 @@ class _UpdateRiderProfileAccountState extends State<UpdateRiderProfileAccount> {
                   const SizedBox(height: 12),
 
                   SizedBox(
-                    height: 120,
+                    // height: 180,
                     child:_userController.docTypeController.text=='nid'?
-                    Row(
+                    Column(
                       children: [
-
-
-                      Expanded(
-                          child: FormField<File>(
-                            validator: (value) {
-                              if (_userController.fontFile == null) {
-                                return 'Please select a font image';
-                              }
-                              return null;
+                      FormField<File>(
+                        validator: (value) {
+                          if (_userController.fontFile == null) {
+                            return 'Please select a font image';
+                          }
+                          return null;
+                        },
+                        builder: (FormFieldState<File> state) {
+                          return GestureDetector(
+                            onTap: () {
+                              _pickFontImage();
                             },
-                            builder: (FormFieldState<File> state) {
-                              return GestureDetector(
-                                onTap: () {
-                                  _pickFontImage();
-                                },
-                                child: _userController.fontFile != null
-                                    ? Container(
-                                  decoration: BoxDecoration(
-                                    image: DecorationImage(
-                                      fit: BoxFit.fill,
-                                      image: FileImage(_userController.fontFile!),
-                                    ),
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                )
-                                    : Container(
-                                  width: double.infinity,
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                      color: state.hasError ? Colors.red : Colors.grey, // show red if error
-                                    ),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(Icons.cloud_upload_outlined,
-                                          color: ColorPath.flushMahogany, size: 32),
-                                      const SizedBox(height: 8),
-                                      Text(
-                                        "Select Font",
-                                        style: TextStyle(
-                                          color: Theme.of(context).brightness == Brightness.dark
-                                              ? Colors.white
-                                              : Colors.black54,
-                                        ),
+                            child: _userController.fontFile != null
+                                ? Container(
+                              height: 300, // This height will now be applied
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: Column(
+                                  children: [
+                                    Expanded( // Makes the image take full available height
+                                      child: Image.file(
+                                        _userController.fontFile!,
+                                        width: double.infinity,
+                                        fit: BoxFit.cover,
                                       ),
-                                      if (state.hasError)
-                                        Padding(
-                                          padding: const EdgeInsets.only(top: 8),
-                                          child: Text(
-                                            state.errorText ?? '',
-                                            style: TextStyle(color: Colors.red, fontSize: 12),
-                                          ),
-                                        ),
-                                    ],
-                                  ),
+                                    ),
+                                  ],
                                 ),
-                              );
-                            },
-                          ),
-
-                        ),
-                      SizedBox(width: 10),
-                      Expanded(
-                          child:  FormField<File>(
-                            validator: (value) {
-                              if (_userController.backSideFile == null) {
-                                return 'Please select a back image';
-                              }
-                              return null;
-                            },
-                            builder: (FormFieldState<File> state) {
-                              return GestureDetector(
-                                onTap: () {
-                                  _pickBackImage();
-                                },
-                                child: _userController.backSideFile != null
-                                    ? Container(
-                                  decoration: BoxDecoration(
-                                    image: DecorationImage(
-                                      fit: BoxFit.fill,
-                                      image: FileImage(_userController.backSideFile!),
+                              ),
+                            )
+                                : Container(
+                              width: double.infinity,
+                              height: 150,
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: state.hasError ? Colors.red : Colors.grey, // show red if error
+                                ),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.cloud_upload_outlined,
+                                      color: ColorPath.flushMahogany, size: 32),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    "Select Font",
+                                    style: TextStyle(
+                                      color: Theme.of(context).brightness == Brightness.dark
+                                          ? Colors.white
+                                          : Colors.black54,
                                     ),
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(12),
                                   ),
-                                )
-                                    : Container(
-                                  width: double.infinity,
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                      color: state.hasError ? Colors.red : Colors.grey, // show red if error
-                                    ),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(Icons.cloud_upload_outlined,
-                                          color: ColorPath.flushMahogany, size: 32),
-                                      const SizedBox(height: 8),
-                                      Text(
-                                        "Select Font",
-                                        style: TextStyle(
-                                          color: Theme.of(context).brightness == Brightness.dark
-                                              ? Colors.white
-                                              : Colors.black54,
-                                        ),
+                                  if (state.hasError)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 8),
+                                      child: Text(
+                                        state.errorText ?? '',
+                                        style: TextStyle(color: Colors.red, fontSize: 12),
                                       ),
-                                      if (state.hasError)
-                                        Padding(
-                                          padding: const EdgeInsets.only(top: 8),
-                                          child: Text(
-                                            state.errorText ?? '',
-                                            style: TextStyle(color: Colors.red, fontSize: 12),
-                                          ),
-                                        ),
-                                    ],
-                                  ),
-                                ),
-                              );
+                                    ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      SizedBox(height: 10),
+                      FormField<File>(
+                        validator: (value) {
+                          if (_userController.backSideFile == null) {
+                            return 'Please select a back image';
+                          }
+                          return null;
+                        },
+                        builder: (FormFieldState<File> state) {
+                          return GestureDetector(
+                            onTap: () {
+                              _pickBackImage();
                             },
-                          ),
-
+                            child: _userController.backSideFile != null
+                                ? Container(
+                              height: 300, // This height will now be applied
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: Column(
+                                  children: [
+                                    Expanded( // Makes the image take full available height
+                                      child: Image.file(
+                                        _userController.backSideFile!,
+                                        width: double.infinity,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            )
+                                : Container(
+                              height: 150,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: state.hasError ? Colors.red : Colors.grey, // show red if error
+                                ),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.cloud_upload_outlined,
+                                      color: ColorPath.flushMahogany, size: 32),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    "Select Font",
+                                    style: TextStyle(
+                                      color: Theme.of(context).brightness == Brightness.dark
+                                          ? Colors.white
+                                          : Colors.black54,
+                                    ),
+                                  ),
+                                  if (state.hasError)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 8),
+                                      child: Text(
+                                        state.errorText ?? '',
+                                        style: TextStyle(color: Colors.red, fontSize: 12),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
                       )
                       ],
                     ):
@@ -396,16 +426,30 @@ class _UpdateRiderProfileAccountState extends State<UpdateRiderProfileAccount> {
                           },
                           child: _userController.otherFile != null
                               ? Container(
+                            height: 300, // This height will now be applied
                             decoration: BoxDecoration(
-                              image: DecorationImage(
-                                fit: BoxFit.fill,
-                                image: FileImage(_userController.otherFile!),
-                              ),
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(12),
                             ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Column(
+                                children: [
+                                  Expanded( // Makes the image take full available height
+                                    child: Image.file(
+                                      _userController.otherFile!,
+                                      width: double.infinity,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           )
+
+
                               : Container(
+                            height: 150,
                             width: double.infinity,
                             decoration: BoxDecoration(
                               border: Border.all(

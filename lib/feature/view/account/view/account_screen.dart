@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:jimamu/feature/controller/auth_controller.dart';
 
 import '../../../controller/theme_controller.dart';
-import '../../auth/update_profile_screen.dart';
+import 'screens/update_user_profile_screen.dart';
 import 'screens/update_rider_profile_screen.dart';
 
 class ProfileOverviewScreen extends StatefulWidget {
@@ -111,7 +111,6 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
               children: [
                  CircleAvatar(
                   radius: 48,
-                  // backgroundImage: AssetImage('assets/icons/profile.png'),
                   backgroundImage: NetworkImage('${_auth.userProfile.data?.profileImage}'),
                 ),
                 // Positioned(
@@ -143,7 +142,7 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
             const SizedBox(height: 12),
 
             // Name and location
-            const Text("CHUON Raksa",
+             Text('${_auth.userProfile.data?.name}',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 4),
             Row(
@@ -194,7 +193,7 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
                         Icons.person_outline, "Customer",
                     ),
                     onTap: () {
-                      Get.to(UpdateProfileScreen());
+                      Get.to(UpdateUserProfileScreen());
                     },
                   ),
 

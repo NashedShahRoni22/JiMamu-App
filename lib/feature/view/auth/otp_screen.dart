@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jimamu/constant/color_path.dart';
 import 'package:jimamu/feature/controller/auth_controller.dart';
-import 'package:jimamu/feature/view/auth/update_profile_screen.dart';
+import 'package:jimamu/feature/view/account/view/screens/update_user_profile_screen.dart';
 import 'package:jimamu/shared_components/custom_button.dart';
 import '../../../constant/global_typography.dart';
 import '../../../utils/ui/custom_widgets.dart';

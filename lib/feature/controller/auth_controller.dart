@@ -12,6 +12,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hive/hive.dart';
 import 'package:jimamu/constant/api_path.dart';
+import 'package:jimamu/feature/controller/user_controller.dart';
 import 'package:jimamu/feature/model/user_profile-model.dart';
 import 'package:jimamu/feature/view/auth/otp_screen.dart';
 import 'package:jimamu/feature/view/home/view/home_screen.dart';
@@ -25,7 +26,7 @@ import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as path;
 
 import '../model/update_rider_data_model.dart';
-import '../view/auth/update_profile_screen.dart';
+import '../view/account/view/screens/update_user_profile_screen.dart';
 class AuthController extends GetxController{
 
 
@@ -101,12 +102,13 @@ UpdateRiderDataModel get riderProfile=>riderBox.get('rider')??UpdateRiderDataMod
         Token token = Token.fromJson(jsonDecode(res.body));
         if(token.success==true){
           tokenBox.put('token', token);
-          getUserProfileData();
-          Get.back();
+
+
           if(token.data!.status=='active'){
-            Get.offAll(HomeScreen());
+
+           getUserProfileData(isVerify: true);
           }else if(token.data!.status=='pending'){
-            Get.offAll(UpdateProfileScreen());
+            Get.offAll(UpdateUserProfileScreen());
           }
 
         }else{
@@ -237,14 +239,14 @@ updateUserProfile(BuildContext context) async {
   Token? token = tokenBox.get('token');
   CustomLoading.loadingDialog();
   try {
-    // Use local asset image
+
     if (imageFile == null) {
       final byteData = await rootBundle.load('assets/auth/profile.png');
       final tempDir = await getTemporaryDirectory();
       imageFile = File('${tempDir.path}/profile.png');
       await imageFile!.writeAsBytes(byteData.buffer.asUint8List());
     }
-// Prepare and send request
+
     final uri = Uri.parse('${ApiPath.baseUrl}${ApiPath.updateUserProfileDataUrl}');
     final request = http.MultipartRequest('POST', uri)
       ..fields['name'] = nameController.text
@@ -254,7 +256,6 @@ updateUserProfile(BuildContext context) async {
       ..fields['phone_number'] = phoneController.text
       ..fields['_method'] = "put";
 
-    // ✅ Add all custom headers
     request.headers.addAll({
       'Access-Control-Allow-Origin': '*',
       'Authorization': 'Bearer ${token!.data!.token}',
@@ -267,7 +268,7 @@ updateUserProfile(BuildContext context) async {
     var sendRequest = await request.send();
     var response = await http.Response.fromStream(sendRequest);
     final responseData = json.decode(response.body);
-    // Assign to model
+
     userProfileDataModel.value = UserProfileDataModel.fromJson(responseData);
 
     updateUserData();
@@ -296,18 +297,26 @@ updateUserProfile(BuildContext context) async {
   }
 }
 
-
-getUserProfileData(){
+getUserProfileData({isVerify=false}){
    isLoadedUserData.value=true;
    ApiRequest apiRequest=ApiRequest(url:ApiPath.getUserProfileDataUrl);
    apiRequest.getRequestWithAuth().then((res){
+
+     // log(res!.body);
+
     isLoadedUserData.value=false;
+
         if(res!.statusCode==200){
-          // log(res.body);
+          if(isVerify==true){
+            Get.put(UserController()).getRiderProfileData();
+            Get.back();
+          }
           userProfileDataModel.value=UserProfileDataModel.fromJson(jsonDecode(res.body));
           userProfileBox.put('user', userProfileDataModel.value);
-          log(jsonEncode(userProfileDataModel.value));
           if(userProfileDataModel.value.data !=null){
+            if(isVerify==true){
+              Get.offAll(HomeScreen());
+            }
             updateUserData();
           }
         }

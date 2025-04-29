@@ -37,7 +37,8 @@ class CustomLoading {
                   // image:DecorationImage(
                   //     image:  AssetImage(AssetPath.logo),
                   // ),
-                  shape: BoxShape.circle, color: ColorPath.kGreyWhite),
+                  // shape: BoxShape.circle, color: ColorPath.kGreyWhite
+              ),
               child:  Lottie.asset('assets/icons/jimamu_loader.json',
                 width: 150,
                 height: 150,
