@@ -24,16 +24,12 @@ class SignInScreen extends StatefulWidget {
 }
 
 class _SignInScreenState extends State<SignInScreen> {
-
-  final AuthController _auth=Get.put(AuthController());
+  final AuthController _auth = Get.put(AuthController());
   final _formKey = GlobalKey<FormState>();
 
-
-@override
+  @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-
   }
 
   @override
@@ -65,96 +61,91 @@ class _SignInScreenState extends State<SignInScreen> {
                         .copyWith(color: ColorPath.black800),
                   ),
                   const SizedBox(height: 16),
-
                   Form(
-                    key: _formKey,
-                      child: Column(children: [
-                    TextFormField(
-                      controller: _auth.emailController,
-                      keyboardType: TextInputType.emailAddress,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Email is required';
-                        }
-
-                        final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-                        if (!emailRegex.hasMatch(value)) {
-                          return 'Enter a valid email address';
-                        }
-
-                        return null; // valid
-                      },
-                      decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide:
-                            BorderSide(color: ColorPath.black100, width: 1),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide:
-                            BorderSide(color: ColorPath.black100, width: 1),
-                          ),
-                          hintText: 'example@gmail.com'),
-                    ),
-
-                        const SizedBox(height: 40),
-                        Center(
-                          child: Text(
-                            'By tapping login, you agree to Terms and Conditions and \nPrivacy of Jimamu.',
-                            style: GlobalTypography.pRegular
-                                .copyWith(color: ColorPath.black800),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                        const SizedBox(height: 40),
-                        SizedBox(
-                          width: double.infinity,
-                          child: CustomButton(
-                            text: 'Login',
-                            function: () {
-
-                              if(_formKey.currentState!.validate()){
-                               _auth.sendOtp();
+                      key: _formKey,
+                      child: Column(
+                        children: [
+                          TextFormField(
+                            controller: _auth.emailController,
+                            keyboardType: TextInputType.emailAddress,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Email is required';
                               }
 
-                            },
-                          ),
-                        ),
-                  ],)),
+                              final emailRegex =
+                                  RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+                              if (!emailRegex.hasMatch(value)) {
+                                return 'Enter a valid email address';
+                              }
 
+                              return null; // valid
+                            },
+                            decoration: InputDecoration(
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                  borderSide: BorderSide(
+                                      color: ColorPath.black100, width: 1),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                  borderSide: BorderSide(
+                                      color: ColorPath.black100, width: 1),
+                                ),
+                                hintText: 'example@gmail.com'),
+                          ),
+                          const SizedBox(height: 40),
+                          Center(
+                            child: Text(
+                              'By tapping login, you agree to Terms and Conditions and \nPrivacy of Jimamu.',
+                              style: GlobalTypography.pRegular
+                                  .copyWith(color: ColorPath.black800),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          const SizedBox(height: 40),
+                          SizedBox(
+                            width: double.infinity,
+                            child: CustomButton(
+                              text: 'Login',
+                              function: () {
+                                if (_formKey.currentState!.validate()) {
+                                  _auth.sendOtp();
+                                }
+                              },
+                            ),
+                          ),
+                        ],
+                      )),
                   const SizedBox(height: 32),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       GestureDetector(
-                      onTap: () async {
-                     _auth.handleGoogleSignIn().then((res){
-                       if(res==true){
-                         _auth.handleSocialLogin(context);
-                       }else{
-                         Fluttertoast.showToast(msg: "Login failed");
-                       }
-                     }) ;
-
-                              },
-              child: Container(
-                decoration: BoxDecoration(
-                  boxShadow: [
-                    BoxShadow(
-                      offset: const Offset(0, 2),
-                      color: Colors.black.withOpacity(0.1),
-                    )
-                  ],
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                padding: const EdgeInsets.all(20),
-                child: Image.asset('assets/auth/google.png'),
-              ),
-            ),
-
-
+                        onTap: () async {
+                          _auth.handleGoogleSignIn().then((res) {
+                            if (res == true) {
+                              _auth.handleSocialLogin(context);
+                            } else {
+                              Fluttertoast.showToast(msg: "Login failed");
+                            }
+                          });
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            boxShadow: [
+                              BoxShadow(
+                                offset: const Offset(0, 2),
+                                color: Colors.black.withOpacity(0.1),
+                              )
+                            ],
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          padding: const EdgeInsets.all(20),
+                          child: Image.asset('assets/auth/google.png'),
+                        ),
+                      ),
                       const SizedBox(width: 12),
                       if (Platform.isIOS)
                         Container(
