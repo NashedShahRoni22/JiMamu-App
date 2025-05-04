@@ -44,18 +44,7 @@ Future<void> main() async{
 
 
   // User
-  Hive.registerAdapter(user.UserProfileDataModelAdapter());
-  Hive.registerAdapter(user.DataAdapter());
 
-  //// Rider
-  Hive.registerAdapter(rider.UpdateRiderDataModelAdapter());
-  Hive.registerAdapter(rider.DataAdapter());
-  Hive.registerAdapter(rider.RiderBankInformationAdapter());
-  Hive.registerAdapter(rider.RiderDocumentAdapter());
-
-  await Hive.openBox<token.Token>(LocalString.TOKEN_BOX);
-  await Hive.openBox<user.UserProfileDataModel>(LocalString.USER_PROFILE_BOX);
-  await Hive.openBox<rider.UpdateRiderDataModel>(LocalString.RIDER_PROFILE_BOX);
 
   runApp( MyApp());
 }
