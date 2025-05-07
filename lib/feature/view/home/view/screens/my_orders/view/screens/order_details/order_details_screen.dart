@@ -77,7 +77,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                       style: GlobalTypography.bodyRegular,
                     ),
                     Text(
-                      'Jonathan Anderson',
+                      widget.orderDetails.receiver.name,
                       style: GlobalTypography.bodyRegular,
                     ),
                   ],
@@ -95,7 +95,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                       style: GlobalTypography.bodyRegular,
                     ),
                     Text(
-                      '01700000000',
+                      widget.orderDetails.receiver.phone,
                       style: GlobalTypography.bodyRegular,
                     ),
                   ],
@@ -159,7 +159,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                       style: GlobalTypography.bodyRegular,
                     ),
                     Text(
-                      '\$${widget.orderDetails.fare}',
+                      '\$${widget.orderDetails.orderAttempts[0].fare}',
                       style: GlobalTypography.sub1Bold,
                     ),
                   ],
@@ -178,16 +178,20 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('Offers (${riderOffers.length}/5)',
+                        Text(
+                            'Offers (${widget.orderDetails.orderAttempts[0].riderBids.length}/5)',
                             style: GlobalTypography.sub2Medium
                                 .copyWith(color: ColorPath.black700)),
                         Text('See all', style: GlobalTypography.bodyMedium),
                       ],
                     ),
                     const SizedBox(height: 16),
-                    ...riderOffers.asMap().entries.map((entry) {
-                      return buildRiderOffer(entry.value, entry.key);
-                    })
+                    ...widget.orderDetails.orderAttempts[0].riderBids
+                        .asMap()
+                        .entries
+                        .map(
+                          (entry) => buildRiderOffer(entry.value, entry.key),
+                        )
                   ],
                 ),
             ],
@@ -197,13 +201,17 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
     );
   }
 
-  Widget buildRiderOffer(RiderOffer rider, int index) {
+  Widget buildRiderOffer(RiderBid riderBid, int index) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(
         children: [
           CircleAvatar(
-              radius: 30, backgroundImage: AssetImage(rider.imagePath)),
+            radius: 30,
+            backgroundImage: riderBid.profileImage != null
+                ? NetworkImage(riderBid.profileImage!)
+                : const AssetImage('assets/auth/profile.png') as ImageProvider,
+          ),
           const SizedBox(width: 12),
           Container(
             width: MediaQuery.of(context).size.width - 104,
@@ -221,13 +229,15 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                     Row(
                       children: [
                         Image.asset('assets/icons/Star.png', height: 14),
-                        Text(' ${rider.rating}',
-                            style: GlobalTypography.p2Medium),
+                        Text(' 4.5', style: GlobalTypography.p2Medium),
                       ],
                     ),
-                    Text('${rider.name} offered you',
-                        style: GlobalTypography.pMedium),
-                    Text('\$${rider.offerAmount}',
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width / 3.5,
+                      child: Text('${riderBid.name} offered you',
+                          style: GlobalTypography.pMedium),
+                    ),
+                    Text('\$${riderBid.bidAmount}',
                         style: GlobalTypography.bodyBold),
                   ],
                 ),
@@ -236,7 +246,8 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                     GestureDetector(
                       onTap: () {
                         setState(() {
-                          riderOffers.removeAt(index);
+                          widget.orderDetails.orderAttempts[0].riderBids
+                              .removeAt(index);
                         });
                       },
                       child: Container(
@@ -255,8 +266,14 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                     GestureDetector(
                       onTap: () {
                         setState(() {
-                          acceptedRider = rider;
-                          riderOffers.clear();
+                          acceptedRider = RiderOffer(
+                            name: riderBid.name,
+                            imagePath: 'assets/icons/profile.png', // fallback
+                            offerAmount: riderBid.bidAmount.toDouble(),
+                            rating: 4.5,
+                          );
+                          widget.orderDetails.orderAttempts[0].riderBids
+                              .clear();
                         });
                       },
                       child: Container(

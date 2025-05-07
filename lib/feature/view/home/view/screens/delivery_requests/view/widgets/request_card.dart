@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:jimamu/constant/color_path.dart';
 
 import '../../../../../../../../constant/global_typography.dart';
+import '../../../../../service/order_service.dart';
 import '../../../my_orders/view/widgets/dotted_line.dart';
 import '../../../my_orders/view/widgets/measure_size.dart';
 
@@ -89,11 +90,10 @@ class _RequestCardState extends State<RequestCard> {
   Widget _buildHeaderRow() {
     return Row(
       children: [
-        Text(widget.orderId, style: GlobalTypography.sub1SemiBold),
+        Text('#${widget.orderId}', style: GlobalTypography.sub1SemiBold),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          child:
-              CircleAvatar(radius: 2, backgroundColor: ColorPath.black400),
+          child: CircleAvatar(radius: 2, backgroundColor: ColorPath.black400),
         ),
         Text(widget.date, style: GlobalTypography.pRegular),
       ],
@@ -142,8 +142,8 @@ class _RequestCardState extends State<RequestCard> {
     return Row(
       children: [
         Text('Fare:',
-            style: GlobalTypography.pRegular
-                .copyWith(color: ColorPath.black400)),
+            style:
+                GlobalTypography.pRegular.copyWith(color: ColorPath.black400)),
         const SizedBox(width: 16),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 6),
@@ -159,8 +159,7 @@ class _RequestCardState extends State<RequestCard> {
             ],
           ),
           child: Text('\$${_currentBid}',
-              style:
-                  GlobalTypography.pBold.copyWith(color: ColorPath.black)),
+              style: GlobalTypography.pBold.copyWith(color: ColorPath.black)),
         ),
         const SizedBox(width: 16),
         InkWell(
@@ -179,11 +178,28 @@ class _RequestCardState extends State<RequestCard> {
               ],
             ),
             child: Text('BID',
-                style:
-                    GlobalTypography.pBold.copyWith(color: ColorPath.white)),
+                style: GlobalTypography.pBold.copyWith(color: ColorPath.white)),
           ),
         ),
       ],
+    );
+  }
+
+  void showLoadingDialog(BuildContext context, {String? message}) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => AlertDialog(
+        content: Row(
+          children: [
+            const CircularProgressIndicator(),
+            const SizedBox(width: 20),
+            Expanded(
+              child: Text(message ?? "Please wait..."),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -194,6 +210,7 @@ class _RequestCardState extends State<RequestCard> {
 
     showDialog(
       context: context,
+      barrierDismissible: false, // optional: prevent dismissal by tap outside
       builder: (context) => AlertDialog(
         backgroundColor: ColorPath.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -242,23 +259,36 @@ class _RequestCardState extends State<RequestCard> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   final entered = int.tryParse(_controller.text.trim());
+
                   if (entered != null &&
                       entered <= leadingBid &&
                       entered >= minimalBid) {
-                    setState(() {
-                      _currentBid = entered;
-                    });
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("Bid placed successfully!"),
-                        duration: Duration(seconds: 2),
-                        backgroundColor: Colors.green,
+                    // Show loading
+                    showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (_) => const AlertDialog(
+                        content: Row(
+                          children: [
+                            CircularProgressIndicator(),
+                            SizedBox(width: 16),
+                            Text("Submitting your bid..."),
+                          ],
+                        ),
                       ),
                     );
+
+                    final success = await OrderService.submitRiderBid(
+                        orderId: widget.orderId,
+                        bidAmount: entered,
+                        context: context);
+
+                    Navigator.pop(context); // Close loading dialog
+                    Navigator.pop(context); // Close bid input dialog
                   } else {
+                    Navigator.pop(context); // Close bid input dialog
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: Text("Enter a valid bid amount"),

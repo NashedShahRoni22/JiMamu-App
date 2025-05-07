@@ -3,28 +3,25 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jimamu/constant/color_path.dart';
 import 'package:jimamu/feature/controller/auth_controller.dart';
-import 'package:jimamu/feature/view/account/view/screens/update_user_profile_screen.dart';
 import 'package:jimamu/shared_components/custom_button.dart';
 import '../../../constant/global_typography.dart';
-import '../../../utils/ui/custom_widgets.dart';
 
 class OtpScreen extends StatefulWidget {
   static const String id = 'otpscreen';
-   OtpScreen({super.key});
+  const OtpScreen({super.key});
 
   @override
   _OtpScreenState createState() => _OtpScreenState();
 }
 
 class _OtpScreenState extends State<OtpScreen> {
-
-
-  final AuthController _auth=Get.put(AuthController());
+  final AuthController _auth = Get.put(AuthController());
 
   late Timer _timer;
   int _secondsRemaining = 180; // 3 minutes countdown
   bool _canResend = false;
-  final List<TextEditingController> _controllers = List.generate(4, (index) => TextEditingController());
+  final List<TextEditingController> _controllers =
+      List.generate(4, (index) => TextEditingController());
   final List<FocusNode> _focusNodes = List.generate(4, (index) => FocusNode());
 
   @override
@@ -95,7 +92,6 @@ class _OtpScreenState extends State<OtpScreen> {
             ? ColorPath.black
             : Colors.white,
       ),
-
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
@@ -136,15 +132,22 @@ class _OtpScreenState extends State<OtpScreen> {
                                 keyboardType: TextInputType.number,
                                 textAlign: TextAlign.center,
                                 maxLength: 1,
-                                style: GlobalTypography.h1SemiBold.copyWith(
-                                  color:ColorPath.black
-                                ),
+                                style: GlobalTypography.h1SemiBold
+                                    .copyWith(color: ColorPath.black),
                                 decoration: const InputDecoration(
                                   counterText: '',
                                   border: InputBorder.none,
                                 ),
-                                onChanged: (value) =>
-                                    _onOtpEntered(index, value),
+                                onChanged: (value) {
+                                  _onOtpEntered(index, value);
+                                  if (index == 3) {
+                                    List<String> texts = _controllers
+                                        .map((controller) => controller.text)
+                                        .toList();
+                                    _auth.otp.value = texts.join();
+                                    _auth.verifyOtp();
+                                  }
+                                },
                               ),
                             ),
                           ),
@@ -164,11 +167,11 @@ class _OtpScreenState extends State<OtpScreen> {
                       child: CustomButton(
                         text: 'Submit',
                         function: () {
-
-                          List<String> texts = _controllers.map((controller) => controller.text).toList();
+                          List<String> texts = _controllers
+                              .map((controller) => controller.text)
+                              .toList();
                           _auth.otp.value = texts.join();
                           _auth.verifyOtp();
-
                         },
                       ),
                     ),
@@ -183,9 +186,8 @@ class _OtpScreenState extends State<OtpScreen> {
                           child: Text(
                             'Resend',
                             style: GlobalTypography.sub1Medium.copyWith(
-                              color: _canResend
-                                  ? ColorPath.black800
-                                  : Colors.grey,
+                              color:
+                                  _canResend ? ColorPath.black800 : Colors.grey,
                             ),
                           ),
                         ),

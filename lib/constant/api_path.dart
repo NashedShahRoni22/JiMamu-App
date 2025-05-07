@@ -17,6 +17,10 @@ class ApiPath {
 
   //Order
   static const String placeOrder = 'orders/new/order/request';
-  static const String fetchMyOrders = 'orders/my/new/order/list';
+  static const String fetchMyOngoingOrders =
+      'orders/new/order/request/ongoing/list';
+  static const String fetchMyCompletedOrders = 'orders/my/completed/order/list';
   static const String orderDetails = 'orders/new/order/request/show/';
+  static const String riderNewOrderRequest = 'rider/my/new/order/request';
+  static const String bidPlacement = 'rider/order/apply/bids/';
 }

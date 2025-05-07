@@ -19,8 +19,6 @@ class ServicesGrid extends StatefulWidget {
 }
 
 class _ServicesGridState extends State<ServicesGrid> {
-  UserController _userController = Get.put(UserController());
-
   @override
   Widget build(BuildContext context) {
     return Wrap(

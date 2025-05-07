@@ -5,7 +5,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:jimamu/feature/view/home/view/screens/place_order/view/screens/location_picker_screen.dart';
 
 import '../../../../../../../constant/global_typography.dart';
-import '../../../../../../../service/order_service.dart';
+import '../../../../service/order_service.dart';
 import '../../../../../../../utils/ui/custom_loading.dart';
 import '../../../../model/place_order_request.dart';
 import '../../../home_screen.dart';
@@ -235,12 +235,12 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
                               const SizedBox(height: 12),
                               _buildAddressCardStep3(),
                               const SizedBox(height: 24),
-                              _sectionTitle("Payment method"),
-                              const SizedBox(height: 12),
-                              _buildPaymentOption("Mastercard"),
-                              const SizedBox(height: 8),
-                              _buildPaymentOption("Visa"),
-                              const SizedBox(height: 24),
+                              // _sectionTitle("Payment method"),
+                              // const SizedBox(height: 12),
+                              // _buildPaymentOption("Mastercard"),
+                              // const SizedBox(height: 8),
+                              // _buildPaymentOption("Visa"),
+                              // const SizedBox(height: 24),
                               _sectionTitle("Order summary"),
                               const SizedBox(height: 12),
                               _buildOrderSummary(),

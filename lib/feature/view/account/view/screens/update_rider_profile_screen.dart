@@ -301,7 +301,7 @@ class _UpdateRiderProfileAccountState extends State<UpdateRiderProfileAccount> {
                                         validator: (value) {
                                           if (_userController.fontFile ==
                                               null) {
-                                            return 'Please select a font image';
+                                            return 'Please select a front image';
                                           }
                                           return null;
                                         },
@@ -314,7 +314,7 @@ class _UpdateRiderProfileAccountState extends State<UpdateRiderProfileAccount> {
                                                     null
                                                 ? Container(
                                                     height:
-                                                        300, // This height will now be applied
+                                                        150, // This height will now be applied
                                                     decoration: BoxDecoration(
                                                       color: Colors.white,
                                                       borderRadius:
@@ -330,6 +330,7 @@ class _UpdateRiderProfileAccountState extends State<UpdateRiderProfileAccount> {
                                                           Expanded(
                                                             // Makes the image take full available height
                                                             child: Image.file(
+                                                              height: 150,
                                                               _userController
                                                                   .fontFile!,
                                                               width: double
@@ -369,7 +370,7 @@ class _UpdateRiderProfileAccountState extends State<UpdateRiderProfileAccount> {
                                                         const SizedBox(
                                                             height: 8),
                                                         Text(
-                                                          "Select Font",
+                                                          "Select Front",
                                                           style: TextStyle(
                                                             color: Theme.of(context)
                                                                         .brightness ==
@@ -420,7 +421,7 @@ class _UpdateRiderProfileAccountState extends State<UpdateRiderProfileAccount> {
                                                     null
                                                 ? Container(
                                                     height:
-                                                        300, // This height will now be applied
+                                                        150, // This height will now be applied
                                                     decoration: BoxDecoration(
                                                       color: Colors.white,
                                                       borderRadius:
@@ -475,7 +476,7 @@ class _UpdateRiderProfileAccountState extends State<UpdateRiderProfileAccount> {
                                                         const SizedBox(
                                                             height: 8),
                                                         Text(
-                                                          "Select Font",
+                                                          "Select Back",
                                                           style: TextStyle(
                                                             color: Theme.of(context)
                                                                         .brightness ==
@@ -524,7 +525,7 @@ class _UpdateRiderProfileAccountState extends State<UpdateRiderProfileAccount> {
                                         child: _userController.otherFile != null
                                             ? Container(
                                                 height:
-                                                    300, // This height will now be applied
+                                                    150, // This height will now be applied
                                                 decoration: BoxDecoration(
                                                   color: Colors.white,
                                                   borderRadius:
