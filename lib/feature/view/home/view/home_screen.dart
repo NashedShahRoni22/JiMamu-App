@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jimamu/constant/color_path.dart';
+import 'package:jimamu/feature/view/activity/view/activity_screen.dart';
 import 'package:jimamu/feature/view/home/view/widgets/banner_indicator.dart';
 import 'package:jimamu/feature/view/home/view/widgets/banner_slider.dart';
 import 'package:jimamu/feature/view/home/view/widgets/search_bar.dart';
@@ -69,44 +70,41 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       body: SafeArea(
-        child: _selectedTabIndex == 0
-            ? SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 16),
-                    const UserInfoHeader(),
-                    const SizedBox(height: 16),
-                    const CustomSearchBar(),
-                    const SizedBox(height: 24),
-                    BannerSlider(
-                      bannerImages: _bannerImages,
-                      currentIndex: _currentBannerIndex,
-                      onPageChanged: (index) => setState(() {
-                        _currentBannerIndex = index;
-                      }),
-                      height: screenHeight * 0.2,
-                    ),
-                    const SizedBox(height: 12),
-                    BannerIndicator(
-                      itemCount: _bannerImages.length,
-                      currentIndex: _currentBannerIndex,
-                    ),
-                    const SizedBox(height: 24),
-                    Text('Services', style: GlobalTypography.h1Medium),
-                    const SizedBox(height: 24),
-                    ServicesGrid(services: _services),
-                    const SizedBox(height: 30),
-                  ],
-                ),
-              )
-            : _selectedTabIndex == 2
-                ? const ProfileOverviewScreen()
-                : const Center(
-                    child: Text('Build on process..'),
+          child: _selectedTabIndex == 0
+              ? SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 16),
+                      const UserInfoHeader(),
+                      const SizedBox(height: 16),
+                      const CustomSearchBar(),
+                      const SizedBox(height: 24),
+                      BannerSlider(
+                        bannerImages: _bannerImages,
+                        currentIndex: _currentBannerIndex,
+                        onPageChanged: (index) => setState(() {
+                          _currentBannerIndex = index;
+                        }),
+                        height: screenHeight * 0.2,
+                      ),
+                      const SizedBox(height: 12),
+                      BannerIndicator(
+                        itemCount: _bannerImages.length,
+                        currentIndex: _currentBannerIndex,
+                      ),
+                      const SizedBox(height: 24),
+                      Text('Services', style: GlobalTypography.h1Medium),
+                      const SizedBox(height: 24),
+                      ServicesGrid(services: _services),
+                      const SizedBox(height: 30),
+                    ],
                   ),
-      ),
+                )
+              : _selectedTabIndex == 2
+                  ? const ProfileOverviewScreen()
+                  : ActivityScreen()),
     );
   }
 }

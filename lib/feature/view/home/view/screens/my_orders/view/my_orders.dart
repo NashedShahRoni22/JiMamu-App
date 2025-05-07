@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:jimamu/constant/color_path.dart';
-import 'package:jimamu/feature/view/home/view/screens/my_orders/view/screens/order_details/view/order_details_screen.dart';
+import 'package:jimamu/feature/view/home/view/screens/my_orders/view/screens/order_details/order_details_screen.dart';
 import 'package:jimamu/feature/view/home/view/screens/my_orders/view/widgets/order_card.dart';
+import 'package:jimamu/service/order_service.dart';
 
 import '../../../../../../../constant/global_typography.dart';
+import '../../../../model/my_order.dart';
 
 class MyOrders extends StatefulWidget {
   static const String id = 'MyOrders';
@@ -15,6 +18,20 @@ class MyOrders extends StatefulWidget {
 
 class _MyOrdersState extends State<MyOrders> {
   int type = 0;
+
+  List<MyOrder> myOrders = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    OrderService.fetchMyOrders().then((orders) {
+      setState(() {
+        myOrders = orders;
+        isLoading = false;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,26 +47,38 @@ class _MyOrdersState extends State<MyOrders> {
             _buildTabBar(),
             const SizedBox(height: 24),
             Expanded(
-              child: ListView.builder(
-                itemCount: 2, // replace with your actual list
-                itemBuilder: (context, index) {
-                  return Column(
-                    children: [
-                      OrderCard(
-                        orderId: '#8T9G88P',
-                        date: '14 May 2023',
-                        from: '1234 Elm Street Springfield, IL 62701',
-                        to: '5678 Maple Avenue Seattle, WA 98101',
-                        status: 'Processing',
-                        onPressed: () {
-                          Navigator.pushNamed(context, OrderDetailsScreen.id);
-                        },
-                      ),
-                      const SizedBox(height: 12),
-                    ],
-                  );
-                },
-              ),
+              child: isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : ListView.builder(
+                      itemCount: myOrders.length,
+                      itemBuilder: (context, index) {
+                        final order = myOrders[index];
+                        return Column(
+                          children: [
+                            OrderCard(
+                                orderId: order.orderId,
+                                date: '7 May 2025', // Add if available
+                                from:
+                                    'Lat: ${order.pickupLatitude}, Long: ${order.pickupLongitude}',
+                                to: 'Lat: ${order.dropLatitude}, Long: ${order.dropLongitude}',
+                                status: 'Processing',
+                                onPressed: () async {
+                                  final details =
+                                      await OrderService.fetchOrderDetails(
+                                          order.orderId);
+                                  if (details != null) {
+                                    Get.to(() => OrderDetailsScreen(
+                                        orderDetails: details));
+                                  } else {
+                                    Get.snackbar("Error",
+                                        "Failed to load order details");
+                                  }
+                                }),
+                            const SizedBox(height: 12),
+                          ],
+                        );
+                      },
+                    ),
             ),
           ],
         ),
@@ -74,8 +103,7 @@ class _MyOrdersState extends State<MyOrders> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color:
-              isSelected ? ColorPath.flushMahogany : ColorPath.secondary,
+          color: isSelected ? ColorPath.flushMahogany : ColorPath.secondary,
           borderRadius: BorderRadius.circular(8),
         ),
         child: Text(

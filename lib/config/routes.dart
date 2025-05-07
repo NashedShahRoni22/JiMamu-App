@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import '../feature/view/account/view/screens/update_rider_profile_screen.dart';
 import '../feature/view/auth/otp_screen.dart';
 import '../feature/view/account/view/screens/update_user_profile_screen.dart';
 import '../feature/view/home/view/home_screen.dart';
 import '../feature/view/home/view/screens/delivery_requests/view/delivery_requests_screen.dart';
 import '../feature/view/home/view/screens/my_orders/view/my_orders.dart';
-import '../feature/view/home/view/screens/my_orders/view/screens/order_details/view/order_details_screen.dart';
 import '../feature/view/home/view/screens/place_order/view/place_order_screen.dart';
 
 Route<dynamic> generateRoute(RouteSettings routeSettings) {
@@ -13,7 +11,7 @@ Route<dynamic> generateRoute(RouteSettings routeSettings) {
     case OtpScreen.id:
       return MaterialPageRoute(
         settings: routeSettings,
-        builder: (_) =>  OtpScreen(),
+        builder: (_) => OtpScreen(),
       );
     case UpdateUserProfileScreen.id:
       return MaterialPageRoute(
@@ -30,11 +28,7 @@ Route<dynamic> generateRoute(RouteSettings routeSettings) {
         settings: routeSettings,
         builder: (_) => const MyOrders(),
       );
-    case OrderDetailsScreen.id:
-      return MaterialPageRoute(
-        settings: routeSettings,
-        builder: (_) => const OrderDetailsScreen(),
-      );
+
     case PlaceOrderScreen.id:
       return MaterialPageRoute(
         settings: routeSettings,

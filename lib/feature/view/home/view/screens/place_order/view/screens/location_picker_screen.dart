@@ -11,7 +11,6 @@ class LocationPickerScreen extends StatefulWidget {
 
 class _LocationPickerScreenState extends State<LocationPickerScreen> {
   LatLng? _pickedLocation;
-  GoogleMapController? _mapController;
 
   Future<LatLng> _getCurrentLocation() async {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -81,9 +80,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
                 )
               },
               onTap: _onMapTap,
-              onMapCreated: (controller) {
-                _mapController = controller;
-              },
+              onMapCreated: (controller) {},
             ),
     );
   }

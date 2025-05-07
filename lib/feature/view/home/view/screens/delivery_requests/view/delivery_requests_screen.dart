@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:jimamu/feature/view/home/view/screens/delivery_requests/view/widgets/request_card.dart';
-
-import '../../my_orders/view/screens/order_details/view/order_details_screen.dart';
+import 'package:jimamu/feature/view/home/view/screens/my_orders/view/screens/order_details/order_details_screen.dart';
+import '../../../../../../../service/order_service.dart';
 
 class DeliveryRequestsScreen extends StatefulWidget {
   static const String id = 'DeliveryRequestsScreen';
@@ -13,6 +14,11 @@ class DeliveryRequestsScreen extends StatefulWidget {
 
 class _DeliveryRequestsScreenState extends State<DeliveryRequestsScreen> {
   int type = 0;
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,8 +43,16 @@ class _DeliveryRequestsScreenState extends State<DeliveryRequestsScreen> {
                         from: '1234 Elm Street Springfield, IL 62701',
                         to: '5678 Maple Avenue Seattle, WA 98101',
                         bid: 180,
-                        onPressed: () {
-                          Navigator.pushNamed(context, OrderDetailsScreen.id);
+                        onPressed: () async {
+                          final details =
+                              await OrderService.fetchOrderDetails('123456');
+                          if (details != null) {
+                            Get.to(() =>
+                                OrderDetailsScreen(orderDetails: details));
+                          } else {
+                            Get.snackbar(
+                                "Error", "Failed to load order details");
+                          }
                         },
                       ),
                       const SizedBox(height: 12),

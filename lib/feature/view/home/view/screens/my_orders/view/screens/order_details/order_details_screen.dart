@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:jimamu/constant/color_path.dart';
-import '../../../../../../../../../../constant/global_typography.dart';
-import '../models/rider_offer_model.dart';
+import '../../../../../../../../../constant/global_typography.dart';
+import '../../../../../../model/order_details.dart';
+import '../../../../../../model/rider_offer_model.dart';
 
 class OrderDetailsScreen extends StatefulWidget {
-  static const String id = 'OrderDetailsScreen';
-  const OrderDetailsScreen({super.key});
+  final OrderDetails orderDetails;
+  const OrderDetailsScreen({required this.orderDetails, super.key});
 
   @override
   State<OrderDetailsScreen> createState() => _OrderDetailsScreenState();
@@ -58,7 +59,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                       style: GlobalTypography.bodyRegular,
                     ),
                     Text(
-                      '#8T9G88P',
+                      '#${widget.orderDetails.orderId}',
                       style: GlobalTypography.sub1Medium,
                     ),
                   ],
@@ -158,7 +159,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                       style: GlobalTypography.bodyRegular,
                     ),
                     Text(
-                      '\$180',
+                      '\$${widget.orderDetails.fare}',
                       style: GlobalTypography.sub1Bold,
                     ),
                   ],
@@ -355,8 +356,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                           decoration: BoxDecoration(
                             border: Border(
                               left: BorderSide(
-                                color:
-                                    ColorPath.flushMahogany.withOpacity(0.5),
+                                color: ColorPath.flushMahogany.withOpacity(0.5),
                                 width: 2,
                                 style: BorderStyle.solid,
                               ),

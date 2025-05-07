@@ -1,5 +1,5 @@
-class ApiPath{
-  static const String baseUrl = 'https://jimamu.sneakpeekbd.com/api/v1/';
+class ApiPath {
+  static const String baseUrl = 'https://jimamu.nsrdev.com/api/v1/';
   static const String baseUrlImage = '';
 
   /////  Login //////////
@@ -15,4 +15,8 @@ class ApiPath{
   static const String riderUpdateProfileDataUrl = 'rider/profile/update';
   static const String getRiderProfileDataUrl = 'rider/profile';
 
+  //Order
+  static const String placeOrder = 'orders/new/order/request';
+  static const String fetchMyOrders = 'orders/my/new/order/list';
+  static const String orderDetails = 'orders/new/order/request/show/';
 }

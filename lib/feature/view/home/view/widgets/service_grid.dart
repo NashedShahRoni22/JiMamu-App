@@ -19,10 +19,7 @@ class ServicesGrid extends StatefulWidget {
 }
 
 class _ServicesGridState extends State<ServicesGrid> {
-
-  UserController _userController=Get.put(UserController());
-
-
+  UserController _userController = Get.put(UserController());
 
   @override
   Widget build(BuildContext context) {
@@ -33,18 +30,30 @@ class _ServicesGridState extends State<ServicesGrid> {
         return InkWell(
           onTap: () {
             if (service['title']! == 'My Orders') {
-              Get.to(MyOrders());
+              Get.to(const MyOrders());
             } else if (service['title']! == 'Place Order') {
-              Get.to(PlaceOrderScreen());
+              Get.to(const PlaceOrderScreen());
             } else if (service['title']! == 'Delivery Requests') {
+              final UserController userController = Get.put(UserController());
+              final roles = userController.riderProfile.data?.role ?? [];
 
-              if(_userController.riderProfile.data!.role![0]=='rider'){
-                Get.to(DeliveryRequestsScreen());
-              }else if(_userController.riderProfile.data!.role![0]=='user'){
-                Get.to(UpdateRiderProfileAccount());
-              }else if(service['title']! == 'My Deliveries'){
+              if (!roles.contains('rider')) {
+                // Wait for frame to finish building
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  Get.to(UpdateRiderProfileAccount());
+
+                  // Optionally show a snackbar or dialog briefly
+                  Get.snackbar(
+                    "Access Denied",
+                    "You must complete your rider profile to access delivery requests.",
+                    backgroundColor: Colors.red.shade100,
+                    colorText: Colors.red.shade900,
+                    duration: const Duration(seconds: 3),
+                  );
+                });
+                return;
               }
-
+              Get.to(const DeliveryRequestsScreen());
             }
           },
           child: SizedBox(
@@ -63,7 +72,11 @@ class _ServicesGridState extends State<ServicesGrid> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Image.asset(service['icon']!,fit: BoxFit.cover,width: double.infinity,),
+                  Image.asset(
+                    service['icon']!,
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                  ),
                   Padding(
                     padding: const EdgeInsets.all(11),
                     child: Row(
@@ -72,15 +85,20 @@ class _ServicesGridState extends State<ServicesGrid> {
                           child: Text(
                             service['title']!,
                             style: GlobalTypography.pMedium.copyWith(
-                             color: Theme.of(context).brightness == Brightness.dark
-                                ? ColorPath.black
-                                : ColorPath.black, // or any other color for light mode
+                              color: Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? ColorPath.black
+                                  : ColorPath
+                                      .black, // or any other color for light mode
                             ),
                           ),
                         ),
-                         Icon(Icons.arrow_forward,color: Theme.of(context).brightness == Brightness.dark
-                            ? ColorPath.black
-                            : ColorPath.black,),
+                        Icon(
+                          Icons.arrow_forward,
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? ColorPath.black
+                              : ColorPath.black,
+                        ),
                       ],
                     ),
                   ),

@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:jimamu/constant/color_path.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:jimamu/feature/view/home/view/screens/place_order/view/screens/location_picker_screen.dart';
 
 import '../../../../../../../constant/global_typography.dart';
+import '../../../../../../../service/order_service.dart';
+import '../../../../../../../utils/ui/custom_loading.dart';
+import '../../../../model/place_order_request.dart';
 import '../../../home_screen.dart';
 
 class PlaceOrderScreen extends StatefulWidget {
@@ -15,6 +19,8 @@ class PlaceOrderScreen extends StatefulWidget {
 }
 
 class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
+  final _formKey = GlobalKey<FormState>();
+
   LatLng? selectedLocation;
   GoogleMapController? mapController;
   int formNumber = 0;
@@ -28,6 +34,15 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
   ];
   String? selectedType;
   String selectedPayment = 'Mastercard';
+
+  final Map<String, TextEditingController> controllers = {
+    'senderName': TextEditingController(),
+    'senderPhone': TextEditingController(),
+    'senderRemarks': TextEditingController(),
+    'receiverName': TextEditingController(),
+    'receiverPhone': TextEditingController(),
+    'receiverRemarks': TextEditingController(),
+  };
 
   Future<void> _selectLocation() async {
     final result = await Navigator.push(
@@ -103,85 +118,100 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
                     Expanded(
                       child: SingleChildScrollView(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _sectionTitle("Sender details"),
-                            const SizedBox(height: 12),
-                            _inputCard(children: [
-                              _inputField("Enter sender name"),
-                              _inputField("Enter sender phone"),
-                              _inputField("Sender remarks", maxLines: 4),
-                            ]),
-                            const SizedBox(height: 24),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                _sectionTitle("Receiver details"),
-                                Text("Save for later",
-                                    style: TextStyle(
-                                        fontSize: 12, color: Colors.grey[700])),
-                              ],
-                            ),
-                            const SizedBox(height: 12),
-                            _inputCard(children: [
-                              _inputField("Enter receiver name"),
-                              _inputField("Enter receiver phone"),
-                              _inputField("Sender remarks", maxLines: 4),
-                            ]),
-                            const SizedBox(height: 24),
-                            _sectionTitle("Choose type"),
-                            const SizedBox(height: 12),
-                            Wrap(
-                              spacing: 8,
-                              runSpacing: 8,
-                              children: types.map((type) {
-                                final isSelected = selectedType == type;
-                                return ChoiceChip(
-                                  label: Text(type),
-                                  selected: isSelected,
-                                  onSelected: (_) {
-                                    setState(() {
-                                      selectedType = type;
-                                    });
-                                  },
-                                  selectedColor: Colors.red.shade100,
-                                  backgroundColor: Colors.grey.shade200,
-                                  labelStyle: TextStyle(
-                                    color: isSelected
-                                        ? Colors.red.shade700
-                                        : Colors.black,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                );
-                              }).toList(),
-                            ),
-                            const SizedBox(height: 36),
-                            SizedBox(
-                              width: double.infinity,
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  setState(() {
-                                    formNumber += 1;
-                                  });
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: ColorPath.flushMahogany,
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 14),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                                child: const Text("Continue",
-                                    style: TextStyle(
-                                        fontSize: 16, color: Colors.white)),
+                        child: Form(
+                          key: _formKey,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _sectionTitle("Sender details"),
+                              const SizedBox(height: 12),
+                              _inputCard(children: [
+                                _inputField("Enter sender name",
+                                    controllers['senderName']),
+                                _inputField("Enter sender phone",
+                                    controllers['senderPhone']),
+                                _inputField("Sender remarks",
+                                    controllers['senderRemarks'],
+                                    maxLines: 4),
+                              ]),
+                              const SizedBox(height: 24),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  _sectionTitle("Receiver details"),
+                                  Text("Save for later",
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.grey[700])),
+                                ],
                               ),
-                            ),
-                            const SizedBox(height: 20),
-                          ],
+                              const SizedBox(height: 12),
+                              _inputCard(children: [
+                                _inputField("Enter receiver name",
+                                    controllers['receiverName']),
+                                _inputField("Enter receiver phone",
+                                    controllers['receiverPhone']),
+                                _inputField("Receiver remarks",
+                                    controllers['receiverRemarks'],
+                                    maxLines: 4),
+                              ]),
+                              const SizedBox(height: 24),
+                              _sectionTitle("Choose type"),
+                              const SizedBox(height: 12),
+                              Wrap(
+                                spacing: 8,
+                                runSpacing: 8,
+                                children: types.map((type) {
+                                  final isSelected = selectedType == type;
+                                  return ChoiceChip(
+                                    label: Text(type),
+                                    selected: isSelected,
+                                    onSelected: (_) {
+                                      setState(() {
+                                        selectedType = type;
+                                      });
+                                    },
+                                    selectedColor: Colors.red.shade100,
+                                    backgroundColor: Colors.grey.shade200,
+                                    labelStyle: TextStyle(
+                                      color: isSelected
+                                          ? Colors.red.shade700
+                                          : Colors.black,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                  );
+                                }).toList(),
+                              ),
+                              const SizedBox(height: 36),
+                              SizedBox(
+                                width: double.infinity,
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    if (_formKey.currentState!.validate()) {
+                                      setState(() {
+                                        formNumber += 1;
+                                      });
+                                    }
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: ColorPath.flushMahogany,
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 14),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                  child: const Text("Continue",
+                                      style: TextStyle(
+                                          fontSize: 16, color: Colors.white)),
+                                ),
+                              ),
+                              const SizedBox(height: 20),
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -242,24 +272,72 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
                                   ),
                                   SizedBox(
                                     child: ElevatedButton(
-                                      onPressed: () {
-                                        // Show snackbar first
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          const SnackBar(
-                                            content: Text('Order submitted'),
-                                            duration: Duration(seconds: 2),
-                                            backgroundColor: Colors.green,
+                                      onPressed: () async {
+                                        final placeOrderRequest =
+                                            PlaceOrderRequest(
+                                          packageId: "1",
+                                          pickupLatitude:
+                                              selectedLocation?.latitude ?? 0.0,
+                                          pickupLongitude:
+                                              selectedLocation?.longitude ??
+                                                  0.0,
+                                          dropLatitude: 43.7615,
+                                          dropLongitude: -79.4111,
+                                          weight: 10,
+                                          totalFare: 47,
+                                          pickupRadius: 1.0,
+                                          senderInformation: PersonInfo(
+                                            name:
+                                                controllers['senderName']!.text,
+                                            phoneNumber:
+                                                controllers['senderPhone']!
+                                                    .text,
+                                            remarks:
+                                                controllers['senderRemarks']!
+                                                    .text,
+                                          ),
+                                          receiverInformation: PersonInfo(
+                                            name: controllers['receiverName']!
+                                                .text,
+                                            phoneNumber:
+                                                controllers['receiverPhone']!
+                                                    .text,
+                                            remarks:
+                                                controllers['receiverRemarks']!
+                                                    .text,
                                           ),
                                         );
 
-                                        // Navigate after a short delay (optional, for smooth UX)
-                                        Future.delayed(
-                                            const Duration(milliseconds: 600),
-                                            () {
-                                          Navigator.pushNamed(
-                                              context, HomeScreen.id);
-                                        });
+                                        try {
+                                          CustomLoading.loadingDialog();
+                                          final response =
+                                              await OrderService.placeOrder(
+                                                  placeOrderRequest);
+                                          Navigator.pop(context);
+                                          if (response.statusCode == 200 ||
+                                              response.statusCode == 201) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              const SnackBar(
+                                                  content: Text(
+                                                      "Order submitted successfully")),
+                                            );
+                                            Get.to(() => HomeScreen());
+                                          } else {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                  content: Text(
+                                                      "Failed: ${response.body}")),
+                                            );
+                                          }
+                                        } catch (e) {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            SnackBar(
+                                                content: Text("Error: $e")),
+                                          );
+                                        }
                                       },
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor:
@@ -293,8 +371,17 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        _buildStepItem(
-            'locations', "Locations", formNumber == 0 ? false : true),
+        InkWell(
+          onTap: formNumber > 0
+              ? () {
+                  setState(() {
+                    formNumber = 0;
+                  });
+                }
+              : null,
+          child: _buildStepItem(
+              'locations', "Locations", formNumber == 0 ? false : true),
+        ),
         Expanded(
           child: Transform.translate(
             offset: const Offset(0, -12),
@@ -306,8 +393,17 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
             ),
           ),
         ),
-        _buildStepItem(
-            'information', "Information", formNumber < 2 ? false : true),
+        InkWell(
+          onTap: formNumber > 1
+              ? () {
+                  setState(() {
+                    formNumber = 1;
+                  });
+                }
+              : null,
+          child: _buildStepItem(
+              'information', "Information", formNumber < 2 ? false : true),
+        ),
         Expanded(
           child: Transform.translate(
             offset: const Offset(0, -12),
@@ -447,8 +543,16 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
     );
   }
 
-  Widget _inputField(String hint, {int maxLines = 1}) {
-    return TextField(
+  Widget _inputField(String hint, TextEditingController? controller,
+      {int maxLines = 1}) {
+    return TextFormField(
+      controller: controller,
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please ${hint[1].toLowerCase() != 'e' ? '' : 'enter '}${hint.toLowerCase()}';
+        }
+        return null;
+      },
       maxLines: maxLines,
       decoration: InputDecoration(
         hintText: hint,
