@@ -2,26 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:jimamu/constant/color_path.dart';
+import 'package:jimamu/feature/view/home/model/my_deliveries.dart';
+import 'package:jimamu/feature/view/home/view/screens/my_deliveries/view/screens/delivery_details.dart';
 import 'package:jimamu/feature/view/home/view/screens/my_orders/view/screens/order_details/order_details_screen.dart';
 import 'package:jimamu/feature/view/home/view/screens/my_orders/view/widgets/order_card.dart';
 import 'package:jimamu/feature/view/home/service/order_service.dart';
 
 import '../../../../../../../constant/global_typography.dart';
-import '../../../../model/my_order.dart';
 
-class MyOrders extends StatefulWidget {
-  static const String id = 'MyOrders';
-  const MyOrders({super.key});
+class MyDeliveries extends StatefulWidget {
+  static const String id = 'MyDeliveries';
+  const MyDeliveries({super.key});
 
   @override
-  State<MyOrders> createState() => _MyOrdersState();
+  State<MyDeliveries> createState() => _MyDeliveriesState();
 }
 
-class _MyOrdersState extends State<MyOrders> {
+class _MyDeliveriesState extends State<MyDeliveries> {
   int type = 0;
 
-  List<MyOrder> myOngoingOrders = [];
-  List<MyOrder> myCompletedOrders = [];
+  List<MyDeliveriesModel> myOngoingOrders = [];
+  List<MyDeliveriesModel> myCompletedOrders = [];
   bool isLoading = true;
 
   @override
@@ -32,14 +33,17 @@ class _MyOrdersState extends State<MyOrders> {
 
   Future<void> _loadOrders() async {
     try {
-      final ongoing = OrderService.fetchMyOngoingOrders();
-      final completed = OrderService.fetchMyCompletedOrders();
+      final ongoingFuture = OrderService.fetchMyOngoingDelivery();
+      final completedFuture = OrderService.fetchMyCompletedDelivery();
 
-      final results = await Future.wait([ongoing, completed]);
+      final results = await Future.wait([
+        ongoingFuture,
+        completedFuture,
+      ]);
 
       setState(() {
-        myOngoingOrders = results[0];
-        myCompletedOrders = results[1];
+        myOngoingOrders = results[0] as List<MyDeliveriesModel>;
+        myCompletedOrders = results[1] as List<MyDeliveriesModel>;
         isLoading = false;
       });
     } catch (e) {
@@ -54,7 +58,7 @@ class _MyOrdersState extends State<MyOrders> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Orders'),
+        title: const Text('My Deliveries'),
         backgroundColor: Colors.white,
       ),
       body: Padding(
@@ -92,17 +96,12 @@ class _MyOrdersState extends State<MyOrders> {
                                           children: [
                                             OrderCard(
                                                 orderId: order.orderId,
-                                                date:
-                                                    '7 May 2025', // Add if available
+                                                date: order
+                                                    .date, // Add if available
                                                 from:
                                                     'Lat: ${order.pickupLatitude}, Long: ${order.pickupLongitude}',
-                                                to:
-                                                    'Lat: ${order.dropLatitude}, Long: ${order.dropLongitude}',
-                                                status: order.status
-                                                    .replaceFirst(
-                                                        order.status[0],
-                                                        order.status[0]
-                                                            .toUpperCase()),
+                                                to: 'Lat: ${order.dropLatitude}, Long: ${order.dropLongitude}',
+                                                status: 'Processing',
                                                 onPressed: () async {
                                                   setState(() {
                                                     isLoading = true;
@@ -116,7 +115,7 @@ class _MyOrdersState extends State<MyOrders> {
                                                   });
                                                   if (details != null) {
                                                     Get.to(() =>
-                                                        OrderDetailsScreen(
+                                                        DeliveryDetailsScreen(
                                                             orderDetails:
                                                                 details));
                                                   } else {
@@ -166,7 +165,7 @@ class _MyOrdersState extends State<MyOrders> {
                                                               order.orderId);
                                                   if (details != null) {
                                                     Get.to(() =>
-                                                        OrderDetailsScreen(
+                                                        DeliveryDetailsScreen(
                                                             orderDetails:
                                                                 details));
                                                   } else {
@@ -189,7 +188,7 @@ class _MyOrdersState extends State<MyOrders> {
   Widget _buildTabBar() {
     return Row(
       children: [
-        _buildTab('Ongoing Orders', 0),
+        _buildTab('Live Orders', 0),
         const SizedBox(width: 8),
         _buildTab('History', 1),
       ],

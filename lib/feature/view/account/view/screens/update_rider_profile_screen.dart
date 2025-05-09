@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:jimamu/feature/controller/user_controller.dart';
-import 'package:jimamu/feature/view/home/view/home_screen.dart';
 import '../../../../../constant/color_path.dart';
 import '../../../../../constant/global_typography.dart';
 import '../../../../../utils/ui/custom_loading.dart';
@@ -70,15 +69,15 @@ class _UpdateRiderProfileAccountState extends State<UpdateRiderProfileAccount> {
     super.initState();
 
     if (_userController.riderProfile.data?.riderDocument?.first.documentType ==
-        'passport') {
+        'Passport') {
       selectedDocType = 'Passport';
     } else if (_userController
             .riderProfile.data?.riderDocument?.first.documentType ==
-        'nid') {
+        'ID Card') {
       selectedDocType = 'ID Card';
     } else if (_userController
             .riderProfile.data?.riderDocument?.first.documentType ==
-        'driving_licence') {
+        'Driver License') {
       selectedDocType = 'Driver License';
     }
   }
@@ -100,6 +99,7 @@ class _UpdateRiderProfileAccountState extends State<UpdateRiderProfileAccount> {
           : Colors.white,
       appBar: AppBar(
         backgroundColor: ColorPath.flushMahogany,
+        foregroundColor: Colors.white,
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
@@ -108,10 +108,6 @@ class _UpdateRiderProfileAccountState extends State<UpdateRiderProfileAccount> {
                     GlobalTypography.sub1Medium.copyWith(color: Colors.white)),
           )
         ],
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Get.to(() => HomeScreen()),
-        ),
       ),
       body: GetX<UserController>(
           init: UserController(),
@@ -196,6 +192,7 @@ class _UpdateRiderProfileAccountState extends State<UpdateRiderProfileAccount> {
                             ),
                             child: DropdownButtonHideUnderline(
                               child: DropdownButton<String>(
+                                disabledHint: Text(selectedDocType ?? 'Types'),
                                 icon: Icon(
                                   Icons.expand_more,
                                   color: ColorPath.black500,
@@ -213,30 +210,20 @@ class _UpdateRiderProfileAccountState extends State<UpdateRiderProfileAccount> {
                                       value: 'Driver License',
                                       child: Text('Driver License')),
                                 ],
-                                onChanged: (String? newValue) {
-                                  setState(() {
-                                    selectedDocType = newValue;
-
-                                    if (selectedDocType == 'Passport') {
-                                      _userController.fontFile = null;
-                                      _userController.backSideFile = null;
-                                      _userController.docTypeController.text =
-                                          'passport';
-                                    } else if (selectedDocType == 'ID Card') {
-                                      _userController.otherFile = null;
-                                      _userController.docTypeController.text =
-                                          'nid';
-                                    } else if (selectedDocType ==
-                                        'Driver License') {
-                                      _userController.fontFile = null;
-                                      _userController.backSideFile = null;
-                                      _userController.docTypeController.text =
-                                          'driving_licence';
-                                    }
-                                  });
-
-                                  print(_userController.docTypeController.text);
-                                },
+                                onChanged: _userController.riderProfile.data
+                                            ?.riderDocument?.isNotEmpty ==
+                                        true
+                                    ? null
+                                    : (String? newValue) {
+                                        setState(() {
+                                          selectedDocType = newValue;
+                                          _userController.docTypeController
+                                              .text = newValue ?? '';
+                                          _userController.fontFile = null;
+                                          _userController.backSideFile = null;
+                                          _userController.otherFile = null;
+                                        });
+                                      },
                               ),
                             ),
                           ),
@@ -256,12 +243,12 @@ class _UpdateRiderProfileAccountState extends State<UpdateRiderProfileAccount> {
                             validator: (val) {
                               if (val.toString().isNotEmpty) {
                                 if (_userController.docTypeController.text ==
-                                    'nid') {
+                                    'ID Card') {
                                   if (val.toString().length == 10 ||
                                       val.toString().length == 13) {
                                     return null;
                                   } else {
-                                    return 'Enter valid nid';
+                                    return 'Enter valid ID number';
                                   }
                                 } else {
                                   return null;
@@ -294,7 +281,7 @@ class _UpdateRiderProfileAccountState extends State<UpdateRiderProfileAccount> {
                           SizedBox(
                             // height: 180,
                             child: _userController.docTypeController.text ==
-                                    'nid'
+                                    'ID Card'
                                 ? Column(
                                     children: [
                                       FormField<File>(

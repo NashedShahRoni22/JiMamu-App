@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
 import 'package:jimamu/constant/color_path.dart';
 import '../../../../../../../../../constant/global_typography.dart';
-import '../../../../../../model/order_details.dart';
-import '../../../../../../model/rider_offer_model.dart';
-import '../../../../../../service/order_service.dart';
+import '../../../../../model/order_details.dart';
+import '../../../../../model/rider_offer_model.dart';
+import '../../../../../service/order_service.dart';
 
-class OrderDetailsScreen extends StatefulWidget {
+class DeliveryDetailsScreen extends StatefulWidget {
   final OrderDetails orderDetails;
-  const OrderDetailsScreen({required this.orderDetails, super.key});
+  const DeliveryDetailsScreen({required this.orderDetails, super.key});
 
   @override
-  State<OrderDetailsScreen> createState() => _OrderDetailsScreenState();
+  State<DeliveryDetailsScreen> createState() => _DeliveryDetailsScreenState();
 }
 
-class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
+class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
   int type = 0;
 
   List<RiderOffer> riderOffers = [
@@ -187,31 +188,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
               const SizedBox(
                 height: 16,
               ),
-              if (acceptedRider != null)
-                buildAcceptedRiderStatus()
-              else
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                            'Offers (${widget.orderDetails.orderAttempts[0].riderBids.length}/5)',
-                            style: GlobalTypography.sub2Medium
-                                .copyWith(color: ColorPath.black700)),
-                        Text('See all', style: GlobalTypography.bodyMedium),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    ...widget.orderDetails.orderAttempts[0].riderBids
-                        .asMap()
-                        .entries
-                        .map(
-                          (entry) => buildRiderOffer(entry.value, entry.key),
-                        )
-                  ],
-                ),
+              buildAcceptedRiderStatus()
             ],
           ),
         ),
@@ -219,153 +196,38 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
     );
   }
 
-  Widget buildRiderOffer(RiderBid riderBid, int index) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Row(
-        children: [
-          CircleAvatar(
-            radius: 30,
-            backgroundImage: riderBid.profileImage != null
-                ? NetworkImage(riderBid.profileImage!)
-                : const AssetImage('assets/auth/profile.png') as ImageProvider,
-          ),
-          const SizedBox(width: 12),
-          Container(
-            width: MediaQuery.of(context).size.width - 104,
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
-            decoration: BoxDecoration(
-              color: ColorPath.secondary,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Image.asset('assets/icons/Star.png', height: 14),
-                        Text(' 4.5', style: GlobalTypography.p2Medium),
-                      ],
-                    ),
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width / 3.5,
-                      child: Text('${riderBid.name} offered you',
-                          style: GlobalTypography.pMedium),
-                    ),
-                    Text('\$${riderBid.bidAmount}',
-                        style: GlobalTypography.bodyBold),
-                  ],
-                ),
-                Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          widget.orderDetails.orderAttempts[0].riderBids
-                              .removeAt(index);
-                        });
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8),
-                          color: ColorPath.flushMahogany,
-                        ),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4),
-                        child: Text('Reject',
-                            style: GlobalTypography.bodyRegular
-                                .copyWith(color: ColorPath.white)),
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    GestureDetector(
-                      onTap: () async {
-                        final attempt = widget.orderDetails.orderAttempts[0];
-                        final orderId = widget.orderDetails.orderId;
-                        final subOrderId = attempt.trackingNumber;
-                        final riderId = riderBid.riderId;
-
-                        showDialog(
-                          context: context,
-                          barrierDismissible: false,
-                          builder: (_) =>
-                              const Center(child: CircularProgressIndicator()),
-                        );
-
-                        final success = await OrderService.confirmRider(
-                            orderId, subOrderId, riderId);
-
-                        Navigator.pop(context); // Close the loading dialog
-
-                        if (success) {
-                          setState(() {
-                            acceptedRider = RiderOffer(
-                              name: riderBid.name,
-                              imagePath: 'assets/icons/profile.png', // fallback
-                              offerAmount: riderBid.bidAmount.toDouble(),
-                              rating: 4.5,
-                            );
-                            widget.orderDetails.orderAttempts[0].riderBids
-                                .clear();
-                          });
-
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text("Rider accepted successfully."),
-                              backgroundColor: Colors.green,
-                            ),
-                          );
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text("Failed to confirm rider."),
-                              backgroundColor: Colors.red,
-                            ),
-                          );
-                        }
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8),
-                          color: ColorPath.green300,
-                        ),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4),
-                        child:
-                            Text('Accept', style: GlobalTypography.bodyRegular),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          )
-        ],
-      ),
-    );
-  }
-
   Widget buildAcceptedRiderStatus() {
-    List<Map<String, dynamic>> steps = [
-      {'label': 'Confirmed', 'icon': 'assets/icons/confirmed.png'},
-      {'label': 'Picked', 'icon': 'assets/icons/picked.png'},
-      {'label': 'Shipping', 'icon': 'assets/icons/shipping.png'},
-      {'label': 'Delivered', 'icon': 'assets/icons/delivered.png'},
+    final List<Map<String, dynamic>> steps = [
+      {
+        'label': 'Confirmed',
+        'iconActive': 'assets/icons/confirmed.png',
+        'iconInactive': 'assets/icons/confirmed_not.png',
+      },
+      {
+        'label': 'Picked',
+        'iconActive': 'assets/icons/picked.png',
+        'iconInactive': 'assets/icons/picked_not.png',
+      },
+      {
+        'label': 'Shipping',
+        'iconActive': 'assets/icons/shipping.png',
+        'iconInactive': 'assets/icons/shipping_not.png',
+      },
+      {
+        'label': 'Delivered',
+        'iconActive': 'assets/icons/delivered.png',
+        'iconInactive': 'assets/icons/delivered_not.png',
+      },
     ];
 
-    // Map status to index for coloring
-    Map<String, int> statusIndex = {
+    final Map<String, int> statusIndex = {
       'pending': -1,
       'confirmed': 0,
-      'picked': 1,
-      'shipping': 2,
+      'picked': 2,
       'delivered': 3,
     };
 
-    int activeStep =
+    final int activeStep =
         statusIndex[widget.orderDetails.status.toLowerCase()] ?? -1;
 
     return Column(
@@ -407,36 +269,78 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
           ),
         ),
         const SizedBox(height: 36),
-        // Timeline Steps
         Padding(
           padding: const EdgeInsets.only(left: 32.0),
           child: Column(
             children: List.generate(steps.length, (index) {
-              bool isActive = index <= activeStep;
-              Color labelColor =
+              final bool isActive = index <= activeStep;
+              final Color labelColor =
                   isActive ? ColorPath.black : ColorPath.black400;
+              final String iconPath = isActive
+                  ? steps[index]['iconActive']
+                  : steps[index]['iconInactive'];
 
               return Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Column(
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: Colors.white60,
-                            borderRadius: BorderRadius.circular(20),
-                            boxShadow: [
-                              BoxShadow(
-                                color: ColorPath.black.withOpacity(0.25),
-                                blurRadius: 1,
-                                offset: const Offset(0, 1),
-                              )
-                            ],
+                      InkWell(
+                        onTap: () async {
+                          if (canTapIcon(index)) {
+                            final status =
+                                widget.orderDetails.status.toLowerCase();
+
+                            if (index == 1 && status == 'confirmed') {
+                              // Picked icon
+                              await OrderService.sendOtp(
+                                  widget.orderDetails.orderId,
+                                  'picked',
+                                  context);
+                              showOtpDialog(
+                                context: context,
+                                orderId: widget.orderDetails.orderId,
+                                otpType: 'picked',
+                                onVerified: (otp) {
+                                  // Do something after verification
+                                },
+                              );
+                            }
+
+                            if (index == 3 && status == 'shipping') {
+                              // Delivered icon
+                              await OrderService.sendOtp(
+                                  widget.orderDetails.orderId,
+                                  'confirmed',
+                                  context);
+                              showOtpDialog(
+                                context: context,
+                                orderId: widget.orderDetails.orderId,
+                                otpType: 'confirmed',
+                                onVerified: (otp) {
+                                  // Do something after verification
+                                },
+                              );
+                            }
+                          }
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: Colors.white60,
+                              borderRadius: BorderRadius.circular(20),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: ColorPath.black.withOpacity(0.25),
+                                  blurRadius: 1,
+                                  offset: const Offset(0, 1),
+                                )
+                              ],
+                            ),
+                            child: Image.asset(iconPath, height: 20),
                           ),
-                          child: Image.asset(steps[index]['icon'], height: 20),
                         ),
                       ),
                       if (index != steps.length - 1)
@@ -447,7 +351,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                           decoration: BoxDecoration(
                             border: Border(
                               left: BorderSide(
-                                color: isActive
+                                color: index < activeStep
                                     ? ColorPath.flushMahogany.withOpacity(0.5)
                                     : ColorPath.white600,
                                 width: 2,
@@ -474,6 +378,102 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  bool canTapIcon(int index) {
+    switch (widget.orderDetails.status.toLowerCase()) {
+      case 'confirmed':
+        return index == 1;
+      case 'picked':
+        return index == 2;
+      case 'shipping':
+        return index == 3;
+      default:
+        return false;
+    }
+  }
+
+  void showOtpDialog({
+    required BuildContext context,
+    required String orderId,
+    required String otpType,
+    required Function(String otp) onVerified,
+  }) {
+    bool isVerifying = false;
+    String enteredOtp = '';
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return StatefulBuilder(builder: (context, setState) {
+          return AlertDialog(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            title: const Text("Enter OTP Code", textAlign: TextAlign.center),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                OtpTextField(
+                  numberOfFields: 4,
+                  borderColor: ColorPath.black,
+                  focusedBorderColor: ColorPath.flushMahogany,
+                  showFieldAsBox: true,
+                  onCodeChanged: (String code) {},
+                  onSubmit: (String code) {
+                    enteredOtp = code;
+                  },
+                ),
+                const SizedBox(height: 24),
+                isVerifying
+                    ? const CircularProgressIndicator()
+                    : SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8)),
+                          ),
+                          onPressed: () async {
+                            if (enteredOtp.length != 4) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content:
+                                      Text("Please enter a valid 4-digit OTP"),
+                                  backgroundColor: Colors.orange,
+                                ),
+                              );
+                              return;
+                            }
+
+                            setState(() => isVerifying = true);
+
+                            final isValid = await OrderService.verifyOtp(
+                              orderId,
+                              otpType,
+                              enteredOtp,
+                              context,
+                            );
+
+                            setState(() => isVerifying = false);
+
+                            if (isValid) {
+                              Navigator.pop(context);
+                              onVerified(enteredOtp);
+                            }
+                          },
+                          child: const Text("Verify OTP",
+                              style: TextStyle(color: Colors.white)),
+                        ),
+                      ),
+              ],
+            ),
+          );
+        });
+      },
     );
   }
 }

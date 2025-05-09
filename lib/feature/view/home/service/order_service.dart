@@ -7,6 +7,7 @@ import 'package:jimamu/constant/local_string.dart';
 import 'package:jimamu/feature/model/token.dart';
 import 'package:jimamu/feature/view/home/model/my_order.dart';
 
+import '../model/my_deliveries.dart';
 import '../model/order_details.dart';
 import '../model/place_order_request.dart';
 import '../view/screens/delivery_requests/models/delivery_request.dart';
@@ -74,6 +75,7 @@ class OrderService {
   static Future<OrderDetails?> fetchOrderDetails(String orderId) async {
     final Box<Token> tokenBox = Hive.box<Token>(LocalString.TOKEN_BOX);
     Token? token = tokenBox.get('token');
+
     final response = await http.get(
       Uri.parse('${ApiPath.baseUrl}${ApiPath.orderDetails}$orderId'),
       headers: {'Authorization': 'Bearer ${token?.data?.token}'},
@@ -82,7 +84,10 @@ class OrderService {
     if (response.statusCode == 200) {
       final body = jsonDecode(response.body);
       if (body['success'] == true) {
-        return OrderDetails.fromJson(body['data']);
+        final List<dynamic> orderList = body['data'];
+        if (orderList.isNotEmpty) {
+          return OrderDetails.fromJson(orderList[0]);
+        }
       }
     }
     return null;
@@ -191,5 +196,122 @@ class OrderService {
     print('Submit Bid Response: ${response.body}');
     return (response.statusCode == 200 || response.statusCode == 201) &&
         jsonDecode(response.body)['success'] == true;
+  }
+
+  static Future<bool> confirmRider(
+      String orderId, String subOrderId, int riderId) async {
+    final Box<Token> tokenBox = Hive.box<Token>(LocalString.TOKEN_BOX);
+    Token? token = tokenBox.get('token');
+
+    final response = await http.get(
+      Uri.parse(
+          '${ApiPath.baseUrl}${ApiPath.confirmRider}$orderId/$subOrderId/$riderId'),
+      headers: {'Authorization': 'Bearer ${token?.data?.token}'},
+    );
+
+    if (response.statusCode == 200) {
+      final body = jsonDecode(response.body);
+      return body['success'] == true;
+    }
+
+    return false;
+  }
+
+  static Future<List<MyDeliveriesModel>> fetchMyOngoingDelivery() async {
+    final Box<Token> tokenBox = Hive.box<Token>(LocalString.TOKEN_BOX);
+    Token? token = tokenBox.get('token');
+
+    final response = await http.get(
+      Uri.parse('${ApiPath.baseUrl}${ApiPath.fetchMyOngoingDelivery}'),
+      headers: {
+        'Authorization': 'Bearer ${token?.data?.token}',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final body = jsonDecode(response.body);
+      final dynamic data = body['data'];
+
+      print(token?.data?.token);
+      print(data);
+      if (data is List) {
+        return data.map((e) => MyDeliveriesModel.fromJson(e)).toList();
+      } else if (data is Map) {
+        return [MyDeliveriesModel.fromJson(data)];
+      } else {
+        return [];
+      }
+    } else {
+      throw Exception('Failed to load orders');
+    }
+  }
+
+  static Future<List<MyDeliveriesModel>> fetchMyCompletedDelivery() async {
+    final Box<Token> tokenBox = Hive.box<Token>(LocalString.TOKEN_BOX);
+    Token? token = tokenBox.get('token');
+
+    final response = await http.get(
+      Uri.parse('${ApiPath.baseUrl}${ApiPath.fetchMyCompletedDelivery}'),
+      headers: {
+        'Authorization': 'Bearer ${token?.data?.token}',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final body = jsonDecode(response.body);
+      final dynamic data = body['data'];
+
+      print(token?.data?.token);
+      print(data);
+      if (data is List) {
+        return data.map((e) => MyDeliveriesModel.fromJson(e)).toList();
+      } else if (data is Map) {
+        return [MyDeliveriesModel.fromJson(data)];
+      } else {
+        return [];
+      }
+    } else {
+      throw Exception('Failed to load orders');
+    }
+  }
+
+  static Future<void> sendOtp(
+      String orderId, String otpType, BuildContext context) async {
+    final Box<Token> tokenBox = Hive.box<Token>(LocalString.TOKEN_BOX);
+    Token? token = tokenBox.get('token');
+
+    final response = await http.get(
+      Uri.parse('${ApiPath.baseUrl}rider/order/send/otp/$orderId/$otpType'),
+      headers: {'Authorization': 'Bearer ${token?.data?.token}'},
+    );
+
+    if (response.statusCode == 200) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("OTP sent to email")));
+    } else {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("Failed to send OTP")));
+    }
+  }
+
+  static Future<bool> verifyOtp(
+      String orderId, String otpType, String otp, BuildContext context) async {
+    final Box<Token> tokenBox = Hive.box<Token>(LocalString.TOKEN_BOX);
+    Token? token = tokenBox.get('token');
+
+    final response = await http.get(
+      Uri.parse('${ApiPath.baseUrl}rider/order/verify/$orderId/$otpType/$otp'),
+      headers: {'Authorization': 'Bearer ${token?.data?.token}'},
+    );
+
+    if (response.statusCode == 200) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("OTP verified successfully")));
+      return true;
+    } else {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("Invalid OTP")));
+      return false;
+    }
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jimamu/feature/controller/user_controller.dart';
 import 'package:jimamu/feature/view/account/view/screens/update_rider_profile_screen.dart';
+import 'package:jimamu/feature/view/home/view/screens/my_deliveries/view/my_deliveries.dart';
 
 import '../../../../../constant/color_path.dart';
 import '../../../../../constant/global_typography.dart';
@@ -52,6 +53,27 @@ class _ServicesGridState extends State<ServicesGrid> {
                 return;
               }
               Get.to(const DeliveryRequestsScreen());
+            } else if (service['title']! == 'My Deliveries') {
+              final UserController userController = Get.put(UserController());
+              final roles = userController.riderProfile.data?.role ?? [];
+
+              if (!roles.contains('rider')) {
+                // Wait for frame to finish building
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  Get.to(UpdateRiderProfileAccount());
+
+                  // Optionally show a snackbar or dialog briefly
+                  Get.snackbar(
+                    "Access Denied",
+                    "You must complete your rider profile to access delivery requests.",
+                    backgroundColor: Colors.red.shade100,
+                    colorText: Colors.red.shade900,
+                    duration: const Duration(seconds: 3),
+                  );
+                });
+                return;
+              }
+              Get.to(const MyDeliveries());
             }
           },
           child: SizedBox(
