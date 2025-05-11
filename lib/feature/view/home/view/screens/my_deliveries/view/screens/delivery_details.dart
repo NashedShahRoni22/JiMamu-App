@@ -287,9 +287,10 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                     children: [
                       InkWell(
                         onTap: () async {
+                          print('${widget.orderDetails.status} $index');
                           if (canTapIcon(index)) {
                             final status =
-                                widget.orderDetails.status.toLowerCase();
+                                widget.orderDetails.status.trim().toLowerCase();
 
                             if (index == 1 && status == 'confirmed') {
                               // Picked icon
@@ -307,16 +308,18 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                               );
                             }
 
-                            if (index == 3 && status == 'shipping') {
+                            if (index == 3 && status == 'picked') {
+                              print('true');
+                              print('${widget.orderDetails.orderId} delivered');
                               // Delivered icon
                               await OrderService.sendOtp(
                                   widget.orderDetails.orderId,
-                                  'confirmed',
+                                  'delivered',
                                   context);
                               showOtpDialog(
                                 context: context,
                                 orderId: widget.orderDetails.orderId,
-                                otpType: 'confirmed',
+                                otpType: 'delivered',
                                 onVerified: (otp) {
                                   // Do something after verification
                                 },
@@ -386,8 +389,6 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
       case 'confirmed':
         return index == 1;
       case 'picked':
-        return index == 2;
-      case 'shipping':
         return index == 3;
       default:
         return false;

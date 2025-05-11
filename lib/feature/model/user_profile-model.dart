@@ -1,4 +1,3 @@
-
 import 'package:hive/hive.dart';
 
 part 'user_profile-model.g.dart';
@@ -68,19 +67,19 @@ class Data {
 
   Data(
       {this.id,
-        this.name,
-        this.email,
-        this.phoneNumber,
-        this.emailVerifiedAt,
-        this.profileImage,
-        this.dob,
-        this.gender,
-        this.verificationCode,
-        this.userType,
-        this.status,
-        this.createdAt,
-        this.updatedAt,
-        this.deletedAt});
+      this.name,
+      this.email,
+      this.phoneNumber,
+      this.emailVerifiedAt,
+      this.profileImage,
+      this.dob,
+      this.gender,
+      this.verificationCode,
+      this.userType,
+      this.status,
+      this.createdAt,
+      this.updatedAt,
+      this.deletedAt});
 
   Data.fromJson(Map<String, dynamic> json) {
     id = json['id'];

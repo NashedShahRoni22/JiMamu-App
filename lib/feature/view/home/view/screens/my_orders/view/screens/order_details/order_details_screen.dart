@@ -349,19 +349,34 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
   }
 
   Widget buildAcceptedRiderStatus() {
-    List<Map<String, dynamic>> steps = [
-      {'label': 'Confirmed', 'icon': 'assets/icons/confirmed.png'},
-      {'label': 'Picked', 'icon': 'assets/icons/picked.png'},
-      {'label': 'Shipping', 'icon': 'assets/icons/shipping.png'},
-      {'label': 'Delivered', 'icon': 'assets/icons/delivered.png'},
+    final List<Map<String, dynamic>> steps = [
+      {
+        'label': 'Confirmed',
+        'iconActive': 'assets/icons/confirmed.png',
+        'iconInactive': 'assets/icons/confirmed_not.png',
+      },
+      {
+        'label': 'Picked',
+        'iconActive': 'assets/icons/picked.png',
+        'iconInactive': 'assets/icons/picked_not.png',
+      },
+      {
+        'label': 'Shipping',
+        'iconActive': 'assets/icons/shipping.png',
+        'iconInactive': 'assets/icons/shipping_not.png',
+      },
+      {
+        'label': 'Delivered',
+        'iconActive': 'assets/icons/delivered.png',
+        'iconInactive': 'assets/icons/delivered_not.png',
+      },
     ];
 
     // Map status to index for coloring
     Map<String, int> statusIndex = {
       'pending': -1,
       'confirmed': 0,
-      'picked': 1,
-      'shipping': 2,
+      'picked': 2,
       'delivered': 3,
     };
 
@@ -412,10 +427,12 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
           padding: const EdgeInsets.only(left: 32.0),
           child: Column(
             children: List.generate(steps.length, (index) {
-              bool isActive = index <= activeStep;
-              Color labelColor =
+              final bool isActive = index <= activeStep;
+              final Color labelColor =
                   isActive ? ColorPath.black : ColorPath.black400;
-
+              final String iconPath = isActive
+                  ? steps[index]['iconActive']
+                  : steps[index]['iconInactive'];
               return Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -436,7 +453,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                               )
                             ],
                           ),
-                          child: Image.asset(steps[index]['icon'], height: 20),
+                          child: Image.asset(iconPath, height: 20),
                         ),
                       ),
                       if (index != steps.length - 1)

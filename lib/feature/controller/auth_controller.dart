@@ -11,7 +11,6 @@ import 'package:get_storage/get_storage.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hive/hive.dart';
 import 'package:jimamu/constant/api_path.dart';
-import 'package:jimamu/feature/controller/user_controller.dart';
 import 'package:jimamu/feature/model/user_profile-model.dart';
 import 'package:jimamu/feature/view/auth/otp_screen.dart';
 import 'package:jimamu/feature/view/home/view/home_screen.dart';
@@ -87,17 +86,14 @@ class AuthController extends GetxController {
 
     ApiRequest apiRequest =
         ApiRequest(url: ApiPath.emailOtpVerifyUrl, body: body);
-    apiRequest.postRequest(isLoadingScreen: false).then((res) {
+    apiRequest.postRequest(isLoadingScreen: false).then((res) async {
       if (res!.statusCode == 200) {
         Token token = Token.fromJson(jsonDecode(res.body));
         if (token.success == true) {
           tokenBox.put('token', token);
 
-          if (token.data!.status == 'active') {
-            getUserProfileData(isVerify: true);
-          } else if (token.data!.status == 'pending') {
-            Get.offAll(UpdateUserProfileScreen());
-          }
+          /// 👇 Now fetch full profile first
+          await getUserProfileData(isVerify: true);
         } else {
           Get.back();
           Fluttertoast.showToast(msg: jsonDecode(res.body)["message"]);
@@ -285,33 +281,37 @@ class AuthController extends GetxController {
     }
   }
 
-  getUserProfileData({isVerify = false}) {
+  Future<void> getUserProfileData({bool isVerify = false}) async {
     isLoadedUserData.value = true;
-    ApiRequest apiRequest = ApiRequest(url: ApiPath.getUserProfileDataUrl);
-    apiRequest.getRequestWithAuth().then((res) {
-      // log(res!.body);
-
+    try {
+      final apiRequest = ApiRequest(url: ApiPath.getUserProfileDataUrl);
+      final res = await apiRequest.getRequestWithAuth();
       isLoadedUserData.value = false;
 
-      if (res!.statusCode == 200) {
-        if (isVerify == true) {
-          Get.put(UserController()).getRiderProfileData();
-          Get.back();
-        }
-        userProfileDataModel.value =
-            UserProfileDataModel.fromJson(jsonDecode(res.body));
-        userProfileBox.put('user', userProfileDataModel.value);
-        if (userProfileDataModel.value.data != null) {
-          if (isVerify == true) {
+      if (res != null && res.statusCode == 200) {
+        final userData = UserProfileDataModel.fromJson(jsonDecode(res.body));
+        userProfileDataModel.value = userData;
+        userProfileBox.put('user', userData);
+        updateUserData();
+
+        bool isProfileComplete =
+            userData.data?.phoneNumber?.isNotEmpty == true &&
+                userData.data?.gender?.isNotEmpty == true &&
+                userData.data?.dob?.isNotEmpty == true;
+
+        /// 👇 Now do the redirection
+        if (isVerify) {
+          if (userData.data?.status == 'active' && isProfileComplete) {
             Get.offAll(HomeScreen());
+          } else {
+            Get.offAll(UpdateUserProfileScreen());
           }
-          updateUserData();
         }
       }
-    }).catchError((e) {
+    } catch (e) {
       isLoadedUserData.value = false;
-      print(e.toString());
-    });
+      print("Profile fetch error: $e");
+    }
   }
 
   updateUserData() {

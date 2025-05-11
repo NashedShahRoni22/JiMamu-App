@@ -26,7 +26,7 @@ class _UpdateUserProfileScreenState extends State<UpdateUserProfileScreen> {
   // File? _image;
   File? _croppedFile;
   DateTime? _selectedDate;
-  String? selectedGender;
+  String? selectedGender = null;
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -98,15 +98,20 @@ class _UpdateUserProfileScreenState extends State<UpdateUserProfileScreen> {
   @override
   void initState() {
     super.initState();
-    // _selectedDate= DateTime.parse("2000-01-01");
-    selectedGender = _auth.userProfile.data?.gender.toString() ?? null;
-    // Example: if you have a saved date from backend/controller
+
+    // Safely assign gender
+    final gender = _auth.userProfile.data?.gender?.toLowerCase();
+    if (gender == 'male' || gender == 'female' || gender == 'other') {
+      selectedGender =
+          gender![0].toUpperCase() + gender.substring(1); // "male" → "Male"
+    }
+
+    // DOB logic
     if (_auth.dobController.text.isNotEmpty) {
       try {
-        _selectedDate =
-            DateTime.parse(_auth.dobController.text); // ✅ Parse existing DOB
-      } catch (e) {
-        _selectedDate = DateTime(2000, 1, 1); // fallback
+        _selectedDate = DateTime.parse(_auth.dobController.text);
+      } catch (_) {
+        _selectedDate = DateTime(2000, 1, 1);
       }
     }
   }
@@ -247,6 +252,13 @@ class _UpdateUserProfileScreenState extends State<UpdateUserProfileScreen> {
                                     child: CustomButton(
                                       text: 'Submit',
                                       function: () {
+                                        if (selectedGender == null) {
+                                          Get.snackbar('Validation Error',
+                                              'Please select a gender',
+                                              colorText: Colors.white,
+                                              backgroundColor: Colors.red);
+                                          return;
+                                        }
                                         // Get.to(HomeScreen());
                                         if (_formKey.currentState!.validate()) {
                                           _auth.updateUserProfile(context);
@@ -377,27 +389,29 @@ class _UpdateUserProfileScreenState extends State<UpdateUserProfileScreen> {
             borderRadius: BorderRadius.circular(8),
           ),
           child: DropdownButtonHideUnderline(
-            child: DropdownButton<String>(
-              icon: Icon(
-                Icons.expand_more,
-                color: ColorPath.black500,
+              child: DropdownButton<String>(
+            value: selectedGender,
+            hint: const Text("Select Gender"),
+            isExpanded: true,
+            items: const [
+              DropdownMenuItem(
+                value: null,
+                child:
+                    Text('Select Gender', style: TextStyle(color: Colors.grey)),
+                enabled: false, // Makes this unselectable once changed
               ),
-              value: selectedGender,
-              hint: Text(value),
-              isExpanded: true,
-              items: const [
-                DropdownMenuItem(value: 'Male', child: Text('Male')),
-                DropdownMenuItem(value: 'Female', child: Text('Female')),
-                DropdownMenuItem(value: 'Other', child: Text('Other')),
-              ],
-              onChanged: (String? newValue) {
-                setState(() {
-                  selectedGender = newValue;
-                  _auth.genderController.text = selectedGender ?? "";
-                });
-              },
-            ),
-          ),
+              DropdownMenuItem(value: 'Male', child: Text('Male')),
+              DropdownMenuItem(value: 'Female', child: Text('Female')),
+              DropdownMenuItem(value: 'Other', child: Text('Other')),
+            ],
+            onChanged: (value) {
+              setState(() {
+                selectedGender = value;
+                _auth.genderController.text =
+                    value ?? ''; // update genderController
+              });
+            },
+          )),
         ),
       ],
     );

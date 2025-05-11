@@ -239,6 +239,9 @@ class _UpdateRiderProfileAccountState extends State<UpdateRiderProfileAccount> {
                           const SizedBox(height: 8),
                           TextFormField(
                             controller: _userController.docNumberController,
+                            enabled: _userController.riderProfile.data
+                                    ?.riderDocument?.isEmpty ==
+                                true,
                             keyboardType: TextInputType.number,
                             validator: (val) {
                               if (val.toString().isNotEmpty) {
@@ -294,9 +297,14 @@ class _UpdateRiderProfileAccountState extends State<UpdateRiderProfileAccount> {
                                         },
                                         builder: (FormFieldState<File> state) {
                                           return GestureDetector(
-                                            onTap: () {
-                                              _pickFontImage();
-                                            },
+                                            onTap: _userController
+                                                        .riderProfile
+                                                        .data
+                                                        ?.riderDocument
+                                                        ?.isEmpty ==
+                                                    true
+                                                ? _pickFontImage
+                                                : null,
                                             child: _userController.fontFile !=
                                                     null
                                                 ? Container(

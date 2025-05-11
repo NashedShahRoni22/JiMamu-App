@@ -157,8 +157,13 @@ class _MyOrdersState extends State<MyOrders> {
                                                     '7 May 2025', // Add if available
                                                 from:
                                                     'Lat: ${order.pickupLatitude}, Long: ${order.pickupLongitude}',
-                                                to: 'Lat: ${order.dropLatitude}, Long: ${order.dropLongitude}',
-                                                status: 'Processing',
+                                                to:
+                                                    'Lat: ${order.dropLatitude}, Long: ${order.dropLongitude}',
+                                                status: order.status
+                                                    .replaceFirst(
+                                                        order.status[0],
+                                                        order.status[0]
+                                                            .toUpperCase()),
                                                 onPressed: () async {
                                                   final details =
                                                       await OrderService

@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import 'package:jimamu/constant/color_path.dart';
 import 'package:jimamu/feature/view/home/model/my_deliveries.dart';
 import 'package:jimamu/feature/view/home/view/screens/my_deliveries/view/screens/delivery_details.dart';
-import 'package:jimamu/feature/view/home/view/screens/my_orders/view/screens/order_details/order_details_screen.dart';
 import 'package:jimamu/feature/view/home/view/screens/my_orders/view/widgets/order_card.dart';
 import 'package:jimamu/feature/view/home/service/order_service.dart';
 
@@ -100,8 +99,13 @@ class _MyDeliveriesState extends State<MyDeliveries> {
                                                     .date, // Add if available
                                                 from:
                                                     'Lat: ${order.pickupLatitude}, Long: ${order.pickupLongitude}',
-                                                to: 'Lat: ${order.dropLatitude}, Long: ${order.dropLongitude}',
-                                                status: 'Processing',
+                                                to:
+                                                    'Lat: ${order.dropLatitude}, Long: ${order.dropLongitude}',
+                                                status: order.status
+                                                    .replaceFirst(
+                                                        order.status[0],
+                                                        order.status[0]
+                                                            .toUpperCase()),
                                                 onPressed: () async {
                                                   setState(() {
                                                     isLoading = true;
@@ -156,8 +160,13 @@ class _MyDeliveriesState extends State<MyDeliveries> {
                                                     '7 May 2025', // Add if available
                                                 from:
                                                     'Lat: ${order.pickupLatitude}, Long: ${order.pickupLongitude}',
-                                                to: 'Lat: ${order.dropLatitude}, Long: ${order.dropLongitude}',
-                                                status: 'Processing',
+                                                to:
+                                                    'Lat: ${order.dropLatitude}, Long: ${order.dropLongitude}',
+                                                status: order.status
+                                                    .replaceFirst(
+                                                        order.status[0],
+                                                        order.status[0]
+                                                            .toUpperCase()),
                                                 onPressed: () async {
                                                   final details =
                                                       await OrderService
