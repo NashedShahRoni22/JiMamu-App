@@ -207,111 +207,108 @@ class _RequestCardState extends State<RequestCard> {
     final TextEditingController _controller = TextEditingController();
     int leadingBid = _currentBid;
     int minimalBid = leadingBid - 40;
+    bool isVerifying = false;
 
     showDialog(
       context: context,
-      barrierDismissible: false, // optional: prevent dismissal by tap outside
-      builder: (context) => AlertDialog(
-        backgroundColor: ColorPath.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        contentPadding: const EdgeInsets.all(20),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text("Your Bids",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text("Leading Bid"),
-                Text("\$$leadingBid.00"),
-              ],
-            ),
-            const SizedBox(height: 6),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text("Minimal Bid"),
-                Text("\$$minimalBid.00"),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text("Place your offer:",
-                  style: TextStyle(color: ColorPath.flushMahogany)),
-            ),
-            const SizedBox(height: 6),
-            TextField(
-              controller: _controller,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                hintText: "Enter amount",
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
+      barrierDismissible: false,
+      builder: (context) => StatefulBuilder(builder: (context, setState) {
+        return AlertDialog(
+          backgroundColor: ColorPath.white,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          contentPadding: const EdgeInsets.all(20),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text("Your Bids",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text("Leading Bid"),
+                  Text("\$$leadingBid.00"),
+                ],
               ),
-            ),
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () async {
-                  final entered = int.tryParse(_controller.text.trim());
-
-                  if (entered != null &&
-                      entered <= leadingBid &&
-                      entered >= minimalBid) {
-                    // Show loading
-                    showDialog(
-                      context: context,
-                      barrierDismissible: false,
-                      builder: (_) => const AlertDialog(
-                        content: Row(
-                          children: [
-                            CircularProgressIndicator(),
-                            SizedBox(width: 16),
-                            Text("Submitting your bid..."),
-                          ],
-                        ),
-                      ),
-                    );
-
-                    final success = await OrderService.submitRiderBid(
-                        orderId: widget.orderId,
-                        bidAmount: entered,
-                        context: context);
-
-                    Navigator.pop(context); // Close loading dialog
-                    Navigator.pop(context); // Close bid input dialog
-                  } else {
-                    Navigator.pop(context); // Close bid input dialog
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("Enter a valid bid amount"),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: ColorPath.flushMahogany,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-                  shape: RoundedRectangleBorder(
+              const SizedBox(height: 6),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text("Minimal Bid"),
+                  Text("\$$minimalBid.00"),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text("Place your offer:",
+                    style: TextStyle(color: ColorPath.flushMahogany)),
+              ),
+              const SizedBox(height: 6),
+              TextField(
+                controller: _controller,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  hintText: "Enter amount",
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                  border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                child: const Text("PLACE BID",
-                    style: TextStyle(color: Colors.white)),
               ),
-            )
-          ],
-        ),
-      ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: isVerifying
+                    ? Center(
+                        child: CircularProgressIndicator(
+                            color: ColorPath.flushMahogany))
+                    : ElevatedButton(
+                        onPressed: () async {
+                          final entered = int.tryParse(_controller.text.trim());
+
+                          if (entered != null &&
+                              entered <= leadingBid &&
+                              entered >= minimalBid) {
+                            setState(() => isVerifying = true);
+
+                            final success = await OrderService.submitRiderBid(
+                              orderId: widget.orderId,
+                              bidAmount: entered,
+                              context: context,
+                            );
+
+                            setState(() => isVerifying = false);
+
+                            Navigator.pop(context); // Close bid input dialog
+                          } else {
+                            Navigator.pop(context); // Close bid input dialog
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Enter a valid bid amount"),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: ColorPath.flushMahogany,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: const Text("PLACE BID",
+                            style: TextStyle(color: Colors.white)),
+                      ),
+              )
+            ],
+          ),
+        );
+      }),
     );
   }
 }

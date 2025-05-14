@@ -63,23 +63,24 @@ class _UpdateRiderProfileAccountState extends State<UpdateRiderProfileAccount> {
     }
   }
 
+  late bool isDocumentAlreadySubmitted;
+
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
-    if (_userController.riderProfile.data?.riderDocument?.first.documentType ==
-        'Passport') {
-      selectedDocType = 'Passport';
-    } else if (_userController
-            .riderProfile.data?.riderDocument?.first.documentType ==
-        'ID Card') {
-      selectedDocType = 'ID Card';
-    } else if (_userController
-            .riderProfile.data?.riderDocument?.first.documentType ==
-        'Driver License') {
-      selectedDocType = 'Driver License';
+    final docList = _userController.riderProfile.data?.riderDocument ?? [];
+
+    if (docList.isNotEmpty &&
+        docList.first.documentType != null &&
+        docList.first.documentNumber != null &&
+        docList.first.documentNumber!.isNotEmpty) {
+      isDocumentAlreadySubmitted = true; // Existing doc
+    } else {
+      isDocumentAlreadySubmitted = false; // First-time user
     }
+
+    selectedDocType = docList.isNotEmpty ? docList.first.documentType : null;
   }
 
   @override
@@ -210,9 +211,7 @@ class _UpdateRiderProfileAccountState extends State<UpdateRiderProfileAccount> {
                                       value: 'Driver License',
                                       child: Text('Driver License')),
                                 ],
-                                onChanged: _userController.riderProfile.data
-                                            ?.riderDocument?.isNotEmpty ==
-                                        true
+                                onChanged: isDocumentAlreadySubmitted
                                     ? null
                                     : (String? newValue) {
                                         setState(() {
@@ -239,9 +238,7 @@ class _UpdateRiderProfileAccountState extends State<UpdateRiderProfileAccount> {
                           const SizedBox(height: 8),
                           TextFormField(
                             controller: _userController.docNumberController,
-                            enabled: _userController.riderProfile.data
-                                    ?.riderDocument?.isEmpty ==
-                                true,
+                            enabled: !isDocumentAlreadySubmitted,
                             keyboardType: TextInputType.number,
                             validator: (val) {
                               if (val.toString().isNotEmpty) {
@@ -297,12 +294,7 @@ class _UpdateRiderProfileAccountState extends State<UpdateRiderProfileAccount> {
                                         },
                                         builder: (FormFieldState<File> state) {
                                           return GestureDetector(
-                                            onTap: _userController
-                                                        .riderProfile
-                                                        .data
-                                                        ?.riderDocument
-                                                        ?.isEmpty ==
-                                                    true
+                                            onTap: !isDocumentAlreadySubmitted
                                                 ? _pickFontImage
                                                 : null,
                                             child: _userController.fontFile !=
@@ -408,9 +400,9 @@ class _UpdateRiderProfileAccountState extends State<UpdateRiderProfileAccount> {
                                         },
                                         builder: (FormFieldState<File> state) {
                                           return GestureDetector(
-                                            onTap: () {
-                                              _pickBackImage();
-                                            },
+                                            onTap: !isDocumentAlreadySubmitted
+                                                ? _pickBackImage
+                                                : null,
                                             child: _userController
                                                         .backSideFile !=
                                                     null
@@ -514,9 +506,9 @@ class _UpdateRiderProfileAccountState extends State<UpdateRiderProfileAccount> {
                                     },
                                     builder: (FormFieldState<File> state) {
                                       return GestureDetector(
-                                        onTap: () {
-                                          _pickOtherImage();
-                                        },
+                                        onTap: !isDocumentAlreadySubmitted
+                                            ? _pickOtherImage
+                                            : null,
                                         child: _userController.otherFile != null
                                             ? Container(
                                                 height:
@@ -586,9 +578,11 @@ class _UpdateRiderProfileAccountState extends State<UpdateRiderProfileAccount> {
                                                                 .only(top: 8),
                                                         child: Text(
                                                           state.errorText ?? '',
-                                                          style: TextStyle(
-                                                              color: Colors.red,
-                                                              fontSize: 12),
+                                                          style:
+                                                              const TextStyle(
+                                                                  color: Colors
+                                                                      .red,
+                                                                  fontSize: 12),
                                                         ),
                                                       ),
                                                   ],
@@ -598,8 +592,22 @@ class _UpdateRiderProfileAccountState extends State<UpdateRiderProfileAccount> {
                                     },
                                   ),
                           ),
-
-                          SizedBox(
+                          const SizedBox(
+                            height: 8,
+                          ),
+                          if (isDocumentAlreadySubmitted)
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 8.0),
+                              child: Container(
+                                color: Colors.grey.shade100,
+                                child: const Text(
+                                  'You’ve already submitted your document. These fields are now locked.',
+                                  style: TextStyle(color: Colors.grey),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ),
+                          const SizedBox(
                             height: 10,
                           ),
                           // GestureDetector(
