@@ -95,9 +95,9 @@ class _MyOrdersState extends State<MyOrders> {
                                                 date:
                                                     '7 May 2025', // Add if available
                                                 from:
-                                                    'Lat: ${order.pickupLatitude}, Long: ${order.pickupLongitude}',
+                                                    'Lat: ${double.parse(order.pickupLatitude).toStringAsFixed(5)}, Long: ${double.parse(order.pickupLongitude).toStringAsFixed(5)}',
                                                 to:
-                                                    'Lat: ${order.dropLatitude}, Long: ${order.dropLongitude}',
+                                                    'Lat: ${double.parse(order.dropLatitude).toStringAsFixed(5)}, Long: ${double.parse(order.dropLongitude).toStringAsFixed(5)}',
                                                 status: order.status
                                                     .replaceFirst(
                                                         order.status[0],
@@ -156,9 +156,9 @@ class _MyOrdersState extends State<MyOrders> {
                                                 date:
                                                     '7 May 2025', // Add if available
                                                 from:
-                                                    'Lat: ${order.pickupLatitude}, Long: ${order.pickupLongitude}',
+                                                    'Lat: ${double.parse(order.pickupLatitude).toStringAsFixed(5)}, Long: ${double.parse(order.pickupLongitude).toStringAsFixed(5)}',
                                                 to:
-                                                    'Lat: ${order.dropLatitude}, Long: ${order.dropLongitude}',
+                                                    'Lat: ${double.parse(order.dropLatitude).toStringAsFixed(5)}, Long: ${double.parse(order.dropLongitude).toStringAsFixed(5)}',
                                                 status: order.status
                                                     .replaceFirst(
                                                         order.status[0],

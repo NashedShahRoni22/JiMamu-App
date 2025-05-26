@@ -274,7 +274,7 @@ class _RequestCardState extends State<RequestCard> {
                               entered >= minimalBid) {
                             setState(() => isVerifying = true);
 
-                            final success = await OrderService.submitRiderBid(
+                            await OrderService.submitRiderBid(
                               orderId: widget.orderId,
                               bidAmount: entered,
                               context: context,

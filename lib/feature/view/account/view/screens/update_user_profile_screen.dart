@@ -21,7 +21,8 @@ class UpdateUserProfileScreen extends StatefulWidget {
 }
 
 class _UpdateUserProfileScreenState extends State<UpdateUserProfileScreen> {
-  final AuthController _auth = Get.put(AuthController());
+  final AuthController _auth = Get.find<AuthController>();
+
   final _formKey = GlobalKey<FormState>();
   // File? _image;
   File? _croppedFile;

@@ -29,11 +29,6 @@ Route<dynamic> generateRoute(RouteSettings routeSettings) {
         builder: (_) => const MyOrders(),
       );
 
-    case PlaceOrderScreen.id:
-      return MaterialPageRoute(
-        settings: routeSettings,
-        builder: (_) => const PlaceOrderScreen(),
-      );
     // case UpdateProfileScreenAccountsTab.id:
     //   return MaterialPageRoute(
     //     settings: routeSettings,

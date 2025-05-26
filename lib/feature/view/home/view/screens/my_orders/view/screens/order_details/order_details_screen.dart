@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:jimamu/constant/color_path.dart';
 import '../../../../../../../../../constant/global_typography.dart';
 import '../../../../../../model/order_details.dart';
@@ -16,25 +17,11 @@ class OrderDetailsScreen extends StatefulWidget {
 class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
   int type = 0;
 
-  List<RiderOffer> riderOffers = [
-    RiderOffer(
-        name: "Azad",
-        imagePath: "assets/icons/profile.png",
-        rating: 4.5,
-        offerAmount: 180),
-    RiderOffer(
-        name: "Shihab",
-        imagePath: "assets/icons/profile2.png",
-        rating: 4.5,
-        offerAmount: 170),
-    RiderOffer(
-        name: "Orbi",
-        imagePath: "assets/icons/profile3.png",
-        rating: 4.5,
-        offerAmount: 180),
-  ];
-
   RiderOffer? acceptedRider;
+  String? pickupLocation;
+  String? dropoffLocation;
+
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -50,7 +37,28 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
       );
       widget.orderDetails.orderAttempts[0].riderBids.clear();
     }
+    loadLocations();
     super.initState();
+  }
+
+  void loadLocations() async {
+    List<Placemark> placemarks = await placemarkFromCoordinates(
+      widget.orderDetails.pickupLat,
+      widget.orderDetails.pickupLng,
+    );
+    final place = placemarks.first;
+    pickupLocation =
+        "${place.name}, ${place.street}, ${place.locality}, ${place.administrativeArea}, ${place.postalCode}, ${place.country}";
+    placemarks = await placemarkFromCoordinates(
+      widget.orderDetails.dropLat,
+      widget.orderDetails.dropLng,
+    );
+    final place2 = placemarks.first;
+    dropoffLocation =
+        "${place2.name}, ${place2.street}, ${place2.locality}, ${place2.administrativeArea}, ${place2.postalCode}, ${place2.country}";
+    setState(() {
+      isLoading = false;
+    });
   }
 
   @override
@@ -60,162 +68,172 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
         title: const Text('Orders Details'),
         backgroundColor: Colors.white,
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Order Id:',
-                      style: GlobalTypography.bodyRegular,
-                    ),
-                    Text(
-                      '#${widget.orderDetails.orderId}',
-                      style: GlobalTypography.sub1Medium,
-                    ),
-                  ],
-                ),
+      body: isLoading
+          ? Center(
+              child: CircularProgressIndicator(
+                color: ColorPath.flushMahogany,
               ),
-              const Divider(),
-              Container(
+            )
+          : SingleChildScrollView(
+              child: Padding(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Recipient:',
-                      style: GlobalTypography.bodyRegular,
-                    ),
-                    Text(
-                      widget.orderDetails.receiver.name,
-                      style: GlobalTypography.bodyRegular,
-                    ),
-                  ],
-                ),
-              ),
-              const Divider(),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Mobile:',
-                      style: GlobalTypography.bodyRegular,
-                    ),
-                    Text(
-                      widget.orderDetails.receiver.phone,
-                      style: GlobalTypography.bodyRegular,
-                    ),
-                  ],
-                ),
-              ),
-              const Divider(),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'From',
-                      style: GlobalTypography.bodyRegular
-                          .copyWith(color: ColorPath.white600),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Order Id:',
+                            style: GlobalTypography.bodyRegular,
+                          ),
+                          Text(
+                            '#${widget.orderDetails.orderId}',
+                            style: GlobalTypography.sub1Medium,
+                          ),
+                        ],
+                      ),
                     ),
-                    const SizedBox(
-                      height: 8,
+                    const Divider(),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Recipient:',
+                            style: GlobalTypography.bodyRegular,
+                          ),
+                          Text(
+                            widget.orderDetails.receiver.name,
+                            style: GlobalTypography.bodyRegular,
+                          ),
+                        ],
+                      ),
                     ),
-                    Text(
-                      'Road No. 1,Flat A2, High Dream Palace',
-                      style: GlobalTypography.bodyRegular,
+                    const Divider(),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Mobile:',
+                            style: GlobalTypography.bodyRegular,
+                          ),
+                          Text(
+                            widget.orderDetails.receiver.phone,
+                            style: GlobalTypography.bodyRegular,
+                          ),
+                        ],
+                      ),
                     ),
+                    const Divider(),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'From',
+                            style: GlobalTypography.bodyRegular
+                                .copyWith(color: ColorPath.white600),
+                          ),
+                          const SizedBox(
+                            height: 8,
+                          ),
+                          Text(
+                            pickupLocation!,
+                            style: GlobalTypography.bodyRegular,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Divider(),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'To',
+                            style: GlobalTypography.bodyRegular
+                                .copyWith(color: ColorPath.white600),
+                          ),
+                          const SizedBox(
+                            height: 8,
+                          ),
+                          Text(
+                            dropoffLocation!,
+                            style: GlobalTypography.bodyRegular,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Divider(
+                      thickness: 2,
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Fare',
+                            style: GlobalTypography.bodyRegular,
+                          ),
+                          Text(
+                            '\$${widget.orderDetails.orderAttempts[0].fare}',
+                            style: GlobalTypography.sub1Bold,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Divider(),
+                    if (acceptedRider != null)
+                      buildAcceptedRiderStatus()
+                    else
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16.0, vertical: 8),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                    'Offers (${widget.orderDetails.orderAttempts[0].riderBids.length}/5)',
+                                    style: GlobalTypography.sub2Medium
+                                        .copyWith(color: ColorPath.black700)),
+                                Text('See all',
+                                    style: GlobalTypography.bodyMedium),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          ...widget.orderDetails.orderAttempts[0].riderBids
+                              .asMap()
+                              .entries
+                              .map(
+                                (entry) =>
+                                    buildRiderOffer(entry.value, entry.key),
+                              )
+                        ],
+                      ),
                   ],
                 ),
               ),
-              const Divider(),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'To',
-                      style: GlobalTypography.bodyRegular
-                          .copyWith(color: ColorPath.white600),
-                    ),
-                    const SizedBox(
-                      height: 8,
-                    ),
-                    Text(
-                      'Ecb Chattar, Dhaka1206.',
-                      style: GlobalTypography.bodyRegular,
-                    ),
-                  ],
-                ),
-              ),
-              const Divider(
-                thickness: 2,
-              ),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Fare',
-                      style: GlobalTypography.bodyRegular,
-                    ),
-                    Text(
-                      '\$${widget.orderDetails.orderAttempts[0].fare}',
-                      style: GlobalTypography.sub1Bold,
-                    ),
-                  ],
-                ),
-              ),
-              const Divider(),
-              const SizedBox(
-                height: 16,
-              ),
-              if (acceptedRider != null)
-                buildAcceptedRiderStatus()
-              else
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                            'Offers (${widget.orderDetails.orderAttempts[0].riderBids.length}/5)',
-                            style: GlobalTypography.sub2Medium
-                                .copyWith(color: ColorPath.black700)),
-                        Text('See all', style: GlobalTypography.bodyMedium),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    ...widget.orderDetails.orderAttempts[0].riderBids
-                        .asMap()
-                        .entries
-                        .map(
-                          (entry) => buildRiderOffer(entry.value, entry.key),
-                        )
-                  ],
-                ),
-            ],
-          ),
-        ),
-      ),
+            ),
     );
   }
 
@@ -412,12 +430,18 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                   children: [
                     Text('Mr ${acceptedRider!.name}',
                         style: GlobalTypography.bodyBold),
-                    Text('40 trials completed',
+                    Text('48 trials completed',
                         style: GlobalTypography.bodyRegular),
                   ],
                 ),
               ),
-              Icon(Icons.call, color: ColorPath.flushMahogany),
+              Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: ColorPath.green300),
+                  child: const Text('Call Now')),
             ],
           ),
         ),

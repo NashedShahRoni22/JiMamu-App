@@ -256,6 +256,8 @@ class AuthController extends GetxController {
 
       if (response.statusCode == 200) {
         userProfileBox.put('user', userProfileDataModel.value);
+        print("Updated Hive with user: ${userProfileDataModel.value}");
+
         Get.back();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

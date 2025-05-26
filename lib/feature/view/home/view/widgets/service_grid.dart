@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:jimamu/feature/controller/user_controller.dart';
 import 'package:jimamu/feature/view/account/view/screens/update_rider_profile_screen.dart';
 import 'package:jimamu/feature/view/home/view/screens/my_deliveries/view/my_deliveries.dart';
+import 'package:jimamu/feature/view/home/view/screens/place_order/view/choose_order_type_screen.dart';
 
 import '../../../../../constant/color_path.dart';
 import '../../../../../constant/global_typography.dart';
@@ -31,7 +32,7 @@ class _ServicesGridState extends State<ServicesGrid> {
             if (service['title']! == 'My Orders') {
               Get.to(const MyOrders());
             } else if (service['title']! == 'Place Order') {
-              Get.to(const PlaceOrderScreen());
+              Get.to(const ChooseOrderTypeScreen());
             } else if (service['title']! == 'Delivery Requests') {
               final UserController userController = Get.put(UserController());
               final roles = userController.riderProfile.data?.role ?? [];

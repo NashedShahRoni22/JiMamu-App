@@ -4,6 +4,7 @@ import 'package:jimamu/constant/color_path.dart';
 import '../../../../../../../../constant/global_typography.dart';
 import 'dotted_line.dart';
 import 'measure_size.dart';
+
 class OrderCard extends StatefulWidget {
   final String orderId;
   final String date;
@@ -84,8 +85,7 @@ class _OrderCardState extends State<OrderCard> {
         Text(widget.orderId, style: GlobalTypography.sub1SemiBold),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          child:
-              CircleAvatar(radius: 2, backgroundColor: ColorPath.black400),
+          child: CircleAvatar(radius: 2, backgroundColor: ColorPath.black400),
         ),
         Text(widget.date, style: GlobalTypography.pRegular),
       ],
@@ -118,11 +118,23 @@ class _OrderCardState extends State<OrderCard> {
             children: [
               Text('From', style: GlobalTypography.bodyMedium),
               const SizedBox(height: 4),
-              Text(widget.from, style: GlobalTypography.pRegular),
+              SizedBox(
+                width: MediaQuery.of(context).size.width * 0.55,
+                child: Text(
+                  widget.from,
+                  style: GlobalTypography.pRegular,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
               const SizedBox(height: 16),
               Text('To', style: GlobalTypography.bodyMedium),
               const SizedBox(height: 4),
-              Text(widget.to, style: GlobalTypography.pRegular),
+              SizedBox(
+                width: MediaQuery.of(context).size.width * 0.55,
+                child: Text(widget.to,
+                    style: GlobalTypography.pRegular,
+                    overflow: TextOverflow.ellipsis),
+              ),
             ],
           ),
         ),
@@ -134,8 +146,8 @@ class _OrderCardState extends State<OrderCard> {
     return Row(
       children: [
         Text('Delivery Status:',
-            style: GlobalTypography.pRegular
-                .copyWith(color: ColorPath.black400)),
+            style:
+                GlobalTypography.pRegular.copyWith(color: ColorPath.black400)),
         const SizedBox(width: 16),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
@@ -151,8 +163,8 @@ class _OrderCardState extends State<OrderCard> {
             ],
           ),
           child: Text(widget.status,
-              style: GlobalTypography.pRegular
-                  .copyWith(color: ColorPath.black)),
+              style:
+                  GlobalTypography.pRegular.copyWith(color: ColorPath.black)),
         ),
       ],
     );

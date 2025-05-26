@@ -1,18 +1,28 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
+import 'package:jimamu/constant/api_path.dart';
 import 'package:jimamu/constant/color_path.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:jimamu/constant/local_string.dart';
 import 'package:jimamu/feature/view/home/view/screens/place_order/view/screens/location_picker_screen.dart';
 
 import '../../../../../../../constant/global_typography.dart';
+import '../../../../../../model/token.dart';
+import '../../../../model/package_types.dart';
 import '../../../../service/order_service.dart';
 import '../../../../../../../utils/ui/custom_loading.dart';
 import '../../../../model/place_order_request.dart';
 import '../../../home_screen.dart';
+import 'package:http/http.dart' as http;
 
 class PlaceOrderScreen extends StatefulWidget {
   static const String id = 'PlaceOrderScreen';
-  const PlaceOrderScreen({super.key});
+  final String type;
+  const PlaceOrderScreen({super.key, required this.type});
 
   @override
   State<PlaceOrderScreen> createState() => _PlaceOrderScreenState();
@@ -21,19 +31,20 @@ class PlaceOrderScreen extends StatefulWidget {
 class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  LatLng? selectedLocation;
+  String? pickupAddress;
+  String? dropoffAddress;
+
+  LatLng? selectedPickupLocation;
+  LatLng? selectedDropoffLocation;
+
   GoogleMapController? mapController;
   int formNumber = 0;
-  final List<String> types = [
-    'Book',
-    'Goods',
-    'Cosmetices',
-    'Electronic',
-    'Medicine',
-    'Computer',
-  ];
   String? selectedType;
   String selectedPayment = 'Mastercard';
+  List<PackageType> packageTypes = [];
+  PackageType? selectedPackage;
+  double? weight;
+  double? value;
 
   final Map<String, TextEditingController> controllers = {
     'senderName': TextEditingController(),
@@ -44,7 +55,37 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
     'receiverRemarks': TextEditingController(),
   };
 
-  Future<void> _selectLocation() async {
+  Future<void> fetchPackageTypes({
+    required double lat,
+    required double lng,
+  }) async {
+    final uri = Uri.parse(
+      '${ApiPath.baseUrl}orders/packages?latitude=$lat&longitude=$lng',
+    );
+    final Box<Token> tokenBox = Hive.box<Token>(LocalString.TOKEN_BOX);
+    Token? token = tokenBox.get('token');
+
+    final response = await http.get(
+      uri,
+      headers: {
+        'Authorization': 'Bearer ${token?.data?.token}',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      final List<dynamic> list = data['data'];
+      setState(() {
+        packageTypes = list.map((e) => PackageType.fromJson(e)).toList();
+      });
+    } else {
+      Get.snackbar("Error", "Failed to load package types");
+      print("API Error: ${response.body}");
+    }
+  }
+
+  Future<void> _selectLocation(String point) async {
     final result = await Navigator.push(
       context,
       MaterialPageRoute(
@@ -54,7 +95,9 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
 
     if (result != null && result is LatLng) {
       setState(() {
-        selectedLocation = result;
+        point == 'pickup'
+            ? selectedPickupLocation = result
+            : selectedDropoffLocation = result;
       });
     }
   }
@@ -92,10 +135,36 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
-                      onPressed: () {
-                        setState(() {
-                          formNumber += 1;
-                        });
+                      onPressed: () async {
+                        if (pickupAddress == null ||
+                            dropoffAddress == null ||
+                            selectedPickupLocation == null) {
+                          Get.snackbar(
+                            "Error",
+                            "Please select Pickup Point and Destination before proceeding",
+                            backgroundColor:
+                                ColorPath.flushMahogany.withOpacity(0.25),
+                          );
+                          return;
+                        }
+
+                        try {
+                          if (formNumber == 0) {
+                            CustomLoading.loadingDialog(); // show loading
+                            await fetchPackageTypes(
+                              lat: selectedPickupLocation!.latitude,
+                              lng: selectedPickupLocation!.longitude,
+                            );
+                            Get.back(); // close loading
+                          }
+                          setState(() {
+                            formNumber += 1;
+                          });
+                        } catch (e) {
+                          Get.back();
+                          Get.snackbar(
+                              "Error", "Failed to fetch package types");
+                        }
                       },
                       child: Text('Continue',
                           style: GlobalTypography.sub1Medium
@@ -140,10 +209,17 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   _sectionTitle("Receiver details"),
-                                  Text("Save for later",
-                                      style: TextStyle(
-                                          fontSize: 12,
-                                          color: Colors.grey[700])),
+                                  Container(
+                                    padding: EdgeInsets.symmetric(
+                                        vertical: 6, horizontal: 12),
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(8),
+                                        color: ColorPath.flushMahogany),
+                                    child: Text("Save for later",
+                                        style: TextStyle(
+                                            fontSize: 12,
+                                            color: ColorPath.white)),
+                                  ),
                                 ],
                               ),
                               const SizedBox(height: 12),
@@ -162,14 +238,15 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
                               Wrap(
                                 spacing: 8,
                                 runSpacing: 8,
-                                children: types.map((type) {
-                                  final isSelected = selectedType == type;
+                                children: packageTypes.map((type) {
+                                  final isSelected =
+                                      selectedPackage?.id == type.id;
                                   return ChoiceChip(
-                                    label: Text(type),
+                                    label: Text(type.name),
                                     selected: isSelected,
                                     onSelected: (_) {
                                       setState(() {
-                                        selectedType = type;
+                                        selectedPackage = type;
                                       });
                                     },
                                     selectedColor: Colors.red.shade100,
@@ -185,7 +262,34 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
                                   );
                                 }).toList(),
                               ),
-                              const SizedBox(height: 36),
+                              const SizedBox(height: 30),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'Additional Information',
+                                    style: GlobalTypography.sub1SemiBold,
+                                  ),
+                                  GestureDetector(
+                                    onTap: () =>
+                                        _showAdditionalInfoSheet(context),
+                                    child: Container(
+                                      padding: EdgeInsets.all(2),
+                                      decoration: BoxDecoration(
+                                        color: ColorPath.flushMahogany,
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
+                                      child: Icon(
+                                        Icons.add,
+                                        size: 16,
+                                        color: ColorPath.white,
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
+                              const SizedBox(height: 45),
                               SizedBox(
                                 width: double.infinity,
                                 child: ElevatedButton(
@@ -273,17 +377,40 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
                                   SizedBox(
                                     child: ElevatedButton(
                                       onPressed: () async {
+                                        List<Placemark> placemarks =
+                                            await placemarkFromCoordinates(
+                                          selectedDropoffLocation!.latitude,
+                                          selectedDropoffLocation!.longitude,
+                                        );
+                                        final place = placemarks.first;
+
                                         final placeOrderRequest =
                                             PlaceOrderRequest(
+                                          parcelEstimatePrice: value!,
+                                          orderType: widget.type,
+                                          orderDestination: OrderDestination(
+                                              country: place.country!,
+                                              state: place.administrativeArea!,
+                                              city: place.locality!,
+                                              area: place.subLocality ??
+                                                  place.subAdministrativeArea!,
+                                              address:
+                                                  "${place.name}, ${place.street}, ${place.locality}, ${place.administrativeArea}, ${place.postalCode}, ${place.country}"),
                                           packageId: "1",
-                                          pickupLatitude:
-                                              selectedLocation?.latitude ?? 0.0,
+                                          pickupLatitude: selectedPickupLocation
+                                                  ?.latitude ??
+                                              0.0,
                                           pickupLongitude:
-                                              selectedLocation?.longitude ??
+                                              selectedPickupLocation
+                                                      ?.longitude ??
                                                   0.0,
-                                          dropLatitude: 43.7615,
-                                          dropLongitude: -79.4111,
-                                          weight: 10,
+                                          dropLatitude: selectedDropoffLocation
+                                                  ?.latitude ??
+                                              0.0,
+                                          dropLongitude: selectedDropoffLocation
+                                                  ?.longitude ??
+                                              0.0,
+                                          weight: weight!,
                                           totalFare: 47,
                                           pickupRadius: 1.0,
                                           senderInformation: PersonInfo(
@@ -363,6 +490,95 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
                     ],
                   ),
                 ),
+    );
+  }
+
+  void _showAdditionalInfoSheet(BuildContext context) {
+    final TextEditingController weightController = TextEditingController();
+    final TextEditingController valueController = TextEditingController();
+
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      isScrollControlled: true,
+      builder: (context) {
+        weightController.text =
+            weight.toString() == 'null' ? '' : weight.toString();
+        valueController.text =
+            value.toString() == 'null' ? '' : value.toString();
+        return Padding(
+          padding: MediaQuery.of(context).viewInsets, // handle keyboard overlap
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 40,
+                  height: 4,
+                  margin: EdgeInsets.only(bottom: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade400,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+                Text(
+                  "Additional information",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 20),
+                TextField(
+                  controller: weightController,
+                  decoration: InputDecoration(
+                    hintText: "Enter weight",
+                    border: OutlineInputBorder(),
+                  ),
+                  keyboardType: TextInputType.number,
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: valueController,
+                  decoration: InputDecoration(
+                    hintText: "Enter value",
+                    border: OutlineInputBorder(),
+                  ),
+                  keyboardType: TextInputType.number,
+                ),
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      // You can access the values like this:
+                      setState(() {
+                        weight = double.parse(weightController.text);
+                        value = double.parse(valueController.text);
+                      });
+
+                      print("Weight: $weight, Value: $value");
+
+                      Navigator.pop(context); // close the bottom sheet
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: ColorPath.flushMahogany,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: const Text(
+                      "Confirm",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -455,23 +671,48 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
       child: Column(
         children: [
           _buildAddressRow(
-            label: 'Collect from',
-            description:
-                'Kilometer 6, 278H, Street 201R, Kroalkor Village, Unnamed Road, Phnom Penh',
+            label: 'Pickup Point',
+            address: pickupAddress,
+            onEdit: () async {
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const LocationPickerScreen()),
+              );
+              if (result != null && result is Map) {
+                setState(() {
+                  selectedPickupLocation = result['latLng'];
+                  pickupAddress = result['address'];
+                });
+              }
+            },
           ),
           const Divider(height: 28),
           _buildAddressRow(
-            label: 'Delivery to',
-            description:
-                '2nd Floor 01, 25 Mao Tse Toung Blvd (245), Phnom Penh 12302, Cambodia',
+            label: 'Destination',
+            address: dropoffAddress,
+            onEdit: () async {
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const LocationPickerScreen()),
+              );
+              if (result != null && result is Map) {
+                setState(() {
+                  selectedDropoffLocation = result['latLng'];
+                  dropoffAddress = result['address'];
+                });
+              }
+            },
           ),
         ],
       ),
     );
   }
 
-  Widget _buildAddressRow(
-      {required String label, required String description}) {
+  _buildAddressRow({
+    required String label,
+    required String? address,
+    required VoidCallback onEdit,
+  }) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -483,13 +724,16 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
             children: [
               Text(label, style: GlobalTypography.bodyMedium),
               const SizedBox(height: 4),
-              Text(description, style: GlobalTypography.pRegular),
+              Text(address ?? "Select $label",
+                  style: GlobalTypography.pRegular.copyWith(
+                    color: address == null ? Colors.grey : Colors.black,
+                  )),
             ],
           ),
         ),
         IconButton(
           icon: Icon(Icons.edit, color: ColorPath.black400, size: 18),
-          onPressed: _selectLocation,
+          onPressed: onEdit,
         )
       ],
     );
@@ -497,24 +741,45 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
 
   Widget _buildMapPreview() {
     return Container(
-      height: 180,
+      height: 200,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: ColorPath.black100),
       ),
       clipBehavior: Clip.hardEdge,
-      child: selectedLocation == null
-          ? const Center(child: Text('No location selected'))
+      child: (selectedPickupLocation == null || selectedDropoffLocation == null)
+          ? const Center(child: Text('Pickup or Destination not selected'))
           : GoogleMap(
               initialCameraPosition: CameraPosition(
-                target: selectedLocation!,
+                target: selectedPickupLocation!,
                 zoom: 14,
               ),
               markers: {
                 Marker(
-                  markerId: const MarkerId("selected"),
-                  position: selectedLocation!,
+                  markerId: const MarkerId("pickup"),
+                  position: selectedPickupLocation!,
+                  infoWindow: const InfoWindow(title: "Pickup Point"),
+                  icon: BitmapDescriptor.defaultMarkerWithHue(
+                      BitmapDescriptor.hueGreen),
                 ),
+                Marker(
+                  markerId: const MarkerId("dropoff"),
+                  position: selectedDropoffLocation!,
+                  infoWindow: const InfoWindow(title: "Destination"),
+                  icon: BitmapDescriptor.defaultMarkerWithHue(
+                      BitmapDescriptor.hueRed),
+                ),
+              },
+              polylines: {
+                Polyline(
+                  polylineId: const PolylineId("route"),
+                  color: Colors.blue,
+                  width: 5,
+                  points: [
+                    selectedPickupLocation!,
+                    selectedDropoffLocation!,
+                  ],
+                )
               },
               onMapCreated: (controller) {
                 mapController = controller;
@@ -529,9 +794,12 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
       decoration: BoxDecoration(
-        color: Colors.grey.shade100,
-        borderRadius: BorderRadius.circular(16),
-      ),
+          color: Colors.grey.shade100,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+                offset: Offset(0, 2), color: ColorPath.black.withOpacity(0.1))
+          ]),
       child: Column(
         children: children
             .map((widget) => Padding(
@@ -587,16 +855,14 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
           _addressRow(
             label: "Collect from",
             subLabel: "Sender address",
-            address:
-                "Kilometer 6, 278H, Street 201R, Kroalkor Village, Unnamed Road, Phnom Penh",
+            address: pickupAddress!,
             editable: true,
           ),
           const SizedBox(height: 16),
           _addressRow(
             label: "Delivery to",
             subLabel: "Receiver address",
-            address:
-                "2nd Floor 01, 25 Mao Tse Toung Blvd (245), Phnom Penh 12302, Cambodia",
+            address: dropoffAddress!,
             editable: true,
           ),
           const SizedBox(height: 16),

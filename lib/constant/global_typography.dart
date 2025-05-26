@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 
 class GlobalTypography {
-  static TextStyle pRegular = const TextStyle(fontSize: 12, fontWeight: FontWeight.w400);
-  static TextStyle bodyRegular = const TextStyle(fontSize: 14, fontWeight: FontWeight.w400);
-  static TextStyle h2Regular = const TextStyle(fontSize: 20, fontWeight: FontWeight.w400);
+  static TextStyle p2Regular =
+      const TextStyle(fontSize: 10, fontWeight: FontWeight.w400);
+  static TextStyle pRegular =
+      const TextStyle(fontSize: 12, fontWeight: FontWeight.w400);
+  static TextStyle bodyRegular =
+      const TextStyle(fontSize: 14, fontWeight: FontWeight.w400);
+  static TextStyle h2Regular =
+      const TextStyle(fontSize: 20, fontWeight: FontWeight.w400);
   static TextStyle sub1Regular =
       const TextStyle(fontSize: 16, fontWeight: FontWeight.w400);
 
@@ -22,6 +27,8 @@ class GlobalTypography {
 
   static TextStyle h1SemiBold =
       const TextStyle(fontSize: 24, fontWeight: FontWeight.w700);
+  static TextStyle bodySemiBold =
+      const TextStyle(fontSize: 14, fontWeight: FontWeight.w700);
   static TextStyle sub1SemiBold =
       const TextStyle(fontSize: 16, fontWeight: FontWeight.w700);
 
