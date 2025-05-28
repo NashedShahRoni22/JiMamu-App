@@ -216,14 +216,18 @@ class AuthController extends GetxController {
   }
 
   updateUserProfile(BuildContext context) async {
+    isLoadedUserData.value = true;
     Token? token = tokenBox.get('token');
-    CustomLoading.loadingDialog();
+    //CustomLoading.loadingDialog();
     try {
       if (imageFile == null) {
-        final byteData = await rootBundle.load('assets/auth/profile.png');
-        final tempDir = await getTemporaryDirectory();
-        imageFile = File('${tempDir.path}/profile.png');
-        await imageFile!.writeAsBytes(byteData.buffer.asUint8List());
+        // Only use default image if there's no image in user profile data
+        if ((userProfile.data?.profileImage ?? '').isEmpty) {
+          final byteData = await rootBundle.load('assets/auth/profile.png');
+          final tempDir = await getTemporaryDirectory();
+          imageFile = File('${tempDir.path}/profile.png');
+          await imageFile!.writeAsBytes(byteData.buffer.asUint8List());
+        }
       }
 
       final uri =
@@ -255,8 +259,9 @@ class AuthController extends GetxController {
       updateUserData();
 
       if (response.statusCode == 200) {
-        userProfileBox.put('user', userProfileDataModel.value);
+        await userProfileBox.put('user', userProfileDataModel.value);
         print("Updated Hive with user: ${userProfileDataModel.value}");
+        isLoadedUserData.value = false;
         Get.back();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

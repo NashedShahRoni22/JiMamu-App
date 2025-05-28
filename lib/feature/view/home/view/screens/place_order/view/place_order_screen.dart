@@ -524,7 +524,7 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
                     borderRadius: BorderRadius.circular(4),
                   ),
                 ),
-                Text(
+                const Text(
                   "Additional information",
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),

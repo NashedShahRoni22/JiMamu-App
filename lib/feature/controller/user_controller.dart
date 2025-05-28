@@ -53,6 +53,10 @@ class UserController extends GetxController {
   File? otherFile;
   int index = 0;
 
+  String? existingFrontImageUrl;
+  String? existingBackImageUrl;
+  String? existingOtherImageUrl;
+
   updateUserProfile(BuildContext context) async {
     Token? token = tokenBox.get('token');
     CustomLoading.loadingDialog();
@@ -120,6 +124,18 @@ class UserController extends GetxController {
   getRiderProfileData() {
     isLoadedUserData.value = true;
     ApiRequest apiRequest = ApiRequest(url: ApiPath.getRiderProfileDataUrl);
+    final docs = updateRiderDataModel.value.data?.riderDocument;
+    if (docs != null && docs.isNotEmpty) {
+      if (docs.first.documentType == 'ID Card') {
+        existingFrontImageUrl =
+            docs.first.document?[0]; // adjust indexing if needed
+        existingBackImageUrl =
+            docs.first.document?.length == 2 ? docs.first.document![1] : null;
+      } else {
+        existingOtherImageUrl = docs.first.document?[0];
+      }
+    }
+
     apiRequest.getRequestWithAuth().then((res) {
       isLoadedUserData.value = false;
       if (res!.statusCode == 200) {
@@ -156,5 +172,6 @@ class UserController extends GetxController {
     expireDateController.text = updateRiderDataModel
             .value.data?.riderBankInformation?.first.expiryDate ??
         "";
+    if (docTypeController.text == 'Driver License') {}
   }
 }

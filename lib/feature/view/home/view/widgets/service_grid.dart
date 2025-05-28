@@ -9,7 +9,6 @@ import '../../../../../constant/color_path.dart';
 import '../../../../../constant/global_typography.dart';
 import '../screens/delivery_requests/view/delivery_requests_screen.dart';
 import '../screens/my_orders/view/my_orders.dart';
-import '../screens/place_order/view/place_order_screen.dart';
 
 class ServicesGrid extends StatefulWidget {
   final List<Map<String, String>> services;

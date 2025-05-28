@@ -262,6 +262,7 @@ class _UpdateUserProfileScreenState extends State<UpdateUserProfileScreen> {
                                         }
                                         // Get.to(HomeScreen());
                                         if (_formKey.currentState!.validate()) {
+                                          setState(() {});
                                           _auth.updateUserProfile(context);
                                         }
                                       },

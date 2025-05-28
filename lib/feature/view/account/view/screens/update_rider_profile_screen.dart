@@ -329,67 +329,86 @@ class _UpdateRiderProfileAccountState extends State<UpdateRiderProfileAccount> {
                                                       ),
                                                     ),
                                                   )
-                                                : Container(
-                                                    width: double.infinity,
-                                                    height: 150,
-                                                    decoration: BoxDecoration(
-                                                      border: Border.all(
-                                                        color: state.hasError
-                                                            ? Colors.red
-                                                            : Colors
-                                                                .grey, // show red if error
-                                                      ),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              12),
-                                                    ),
-                                                    child: Column(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .center,
-                                                      children: [
-                                                        Icon(
-                                                            Icons
-                                                                .cloud_upload_outlined,
-                                                            color: ColorPath
-                                                                .flushMahogany,
-                                                            size: 32),
-                                                        const SizedBox(
-                                                            height: 8),
-                                                        Text(
-                                                          "Select Front",
-                                                          style: TextStyle(
-                                                            color: Theme.of(context)
-                                                                        .brightness ==
-                                                                    Brightness
-                                                                        .dark
-                                                                ? Colors.white
-                                                                : Colors
-                                                                    .black54,
-                                                          ),
-                                                        ),
-                                                        if (state.hasError)
-                                                          Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .only(
-                                                                    top: 8),
-                                                            child: Text(
-                                                              state.errorText ??
-                                                                  '',
-                                                              style: TextStyle(
-                                                                  color: Colors
-                                                                      .red,
-                                                                  fontSize: 12),
+                                                : _userController.fontFile !=
+                                                        null
+                                                    ? Image.file(_userController
+                                                        .fontFile!)
+                                                    : _userController
+                                                                .existingFrontImageUrl !=
+                                                            null
+                                                        ? Image.network(
+                                                            _userController
+                                                                .existingFrontImageUrl!,
+                                                            height: 150,
+                                                          )
+                                                        : Container(
+                                                            width:
+                                                                double.infinity,
+                                                            height: 150,
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              border:
+                                                                  Border.all(
+                                                                color: state
+                                                                        .hasError
+                                                                    ? Colors.red
+                                                                    : Colors
+                                                                        .grey, // show red if error
+                                                              ),
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          12),
+                                                            ),
+                                                            child: Column(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .center,
+                                                              children: [
+                                                                Icon(
+                                                                    Icons
+                                                                        .cloud_upload_outlined,
+                                                                    color: ColorPath
+                                                                        .flushMahogany,
+                                                                    size: 32),
+                                                                const SizedBox(
+                                                                    height: 8),
+                                                                Text(
+                                                                  "Select Front",
+                                                                  style:
+                                                                      TextStyle(
+                                                                    color: Theme.of(context).brightness ==
+                                                                            Brightness
+                                                                                .dark
+                                                                        ? Colors
+                                                                            .white
+                                                                        : Colors
+                                                                            .black54,
+                                                                  ),
+                                                                ),
+                                                                if (state
+                                                                    .hasError)
+                                                                  Padding(
+                                                                    padding: const EdgeInsets
+                                                                        .only(
+                                                                        top: 8),
+                                                                    child: Text(
+                                                                      state.errorText ??
+                                                                          '',
+                                                                      style: TextStyle(
+                                                                          color: Colors
+                                                                              .red,
+                                                                          fontSize:
+                                                                              12),
+                                                                    ),
+                                                                  ),
+                                                              ],
                                                             ),
                                                           ),
-                                                      ],
-                                                    ),
-                                                  ),
                                           );
                                         },
                                       ),
-                                      SizedBox(height: 10),
+                                      const SizedBox(height: 10),
                                       FormField<File>(
                                         validator: (value) {
                                           if (_userController.backSideFile ==
@@ -435,63 +454,83 @@ class _UpdateRiderProfileAccountState extends State<UpdateRiderProfileAccount> {
                                                       ),
                                                     ),
                                                   )
-                                                : Container(
-                                                    height: 150,
-                                                    width: double.infinity,
-                                                    decoration: BoxDecoration(
-                                                      border: Border.all(
-                                                        color: state.hasError
-                                                            ? Colors.red
-                                                            : Colors
-                                                                .grey, // show red if error
-                                                      ),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              12),
-                                                    ),
-                                                    child: Column(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .center,
-                                                      children: [
-                                                        Icon(
-                                                            Icons
-                                                                .cloud_upload_outlined,
-                                                            color: ColorPath
-                                                                .flushMahogany,
-                                                            size: 32),
-                                                        const SizedBox(
-                                                            height: 8),
-                                                        Text(
-                                                          "Select Back",
-                                                          style: TextStyle(
-                                                            color: Theme.of(context)
-                                                                        .brightness ==
-                                                                    Brightness
-                                                                        .dark
-                                                                ? Colors.white
-                                                                : Colors
-                                                                    .black54,
-                                                          ),
-                                                        ),
-                                                        if (state.hasError)
-                                                          Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .only(
-                                                                    top: 8),
-                                                            child: Text(
-                                                              state.errorText ??
-                                                                  '',
-                                                              style: TextStyle(
-                                                                  color: Colors
-                                                                      .red,
-                                                                  fontSize: 12),
+                                                : _userController
+                                                            .backSideFile !=
+                                                        null
+                                                    ? Image.file(_userController
+                                                        .backSideFile!)
+                                                    : _userController
+                                                                .existingBackImageUrl !=
+                                                            null
+                                                        ? Image.network(
+                                                            _userController
+                                                                .existingBackImageUrl!,
+                                                            height: 150,
+                                                          )
+                                                        : Container(
+                                                            height: 150,
+                                                            width:
+                                                                double.infinity,
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              border:
+                                                                  Border.all(
+                                                                color: state
+                                                                        .hasError
+                                                                    ? Colors.red
+                                                                    : Colors
+                                                                        .grey, // show red if error
+                                                              ),
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          12),
+                                                            ),
+                                                            child: Column(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .center,
+                                                              children: [
+                                                                Icon(
+                                                                    Icons
+                                                                        .cloud_upload_outlined,
+                                                                    color: ColorPath
+                                                                        .flushMahogany,
+                                                                    size: 32),
+                                                                const SizedBox(
+                                                                    height: 8),
+                                                                Text(
+                                                                  "Select Back",
+                                                                  style:
+                                                                      TextStyle(
+                                                                    color: Theme.of(context).brightness ==
+                                                                            Brightness
+                                                                                .dark
+                                                                        ? Colors
+                                                                            .white
+                                                                        : Colors
+                                                                            .black54,
+                                                                  ),
+                                                                ),
+                                                                if (state
+                                                                    .hasError)
+                                                                  Padding(
+                                                                    padding: const EdgeInsets
+                                                                        .only(
+                                                                        top: 8),
+                                                                    child: Text(
+                                                                      state.errorText ??
+                                                                          '',
+                                                                      style: TextStyle(
+                                                                          color: Colors
+                                                                              .red,
+                                                                          fontSize:
+                                                                              12),
+                                                                    ),
+                                                                  ),
+                                                              ],
                                                             ),
                                                           ),
-                                                      ],
-                                                    ),
-                                                  ),
                                           );
                                         },
                                       )
@@ -500,7 +539,7 @@ class _UpdateRiderProfileAccountState extends State<UpdateRiderProfileAccount> {
                                 : FormField<File>(
                                     validator: (value) {
                                       if (_userController.otherFile == null) {
-                                        return 'Please select a font image';
+                                        return 'Please select a image';
                                       }
                                       return null;
                                     },
@@ -537,57 +576,78 @@ class _UpdateRiderProfileAccountState extends State<UpdateRiderProfileAccount> {
                                                   ),
                                                 ),
                                               )
-                                            : Container(
-                                                height: 150,
-                                                width: double.infinity,
-                                                decoration: BoxDecoration(
-                                                  border: Border.all(
-                                                    color: state.hasError
-                                                        ? Colors.red
-                                                        : Colors
-                                                            .grey, // show red if error
-                                                  ),
-                                                  borderRadius:
-                                                      BorderRadius.circular(12),
-                                                ),
-                                                child: Column(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  children: [
-                                                    Icon(
-                                                        Icons
-                                                            .cloud_upload_outlined,
-                                                        color: ColorPath
-                                                            .flushMahogany,
-                                                        size: 32),
-                                                    const SizedBox(height: 8),
-                                                    Text(
-                                                      "Select your file",
-                                                      style: TextStyle(
-                                                        color: Theme.of(context)
-                                                                    .brightness ==
-                                                                Brightness.dark
-                                                            ? Colors.white
-                                                            : Colors.black54,
-                                                      ),
-                                                    ),
-                                                    if (state.hasError)
-                                                      Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .only(top: 8),
-                                                        child: Text(
-                                                          state.errorText ?? '',
-                                                          style:
-                                                              const TextStyle(
-                                                                  color: Colors
-                                                                      .red,
-                                                                  fontSize: 12),
+                                            : _userController.otherFile != null
+                                                ? Image.file(
+                                                    _userController.otherFile!)
+                                                : _userController
+                                                            .existingOtherImageUrl !=
+                                                        null
+                                                    ? Image.network(
+                                                        _userController
+                                                            .existingOtherImageUrl!,
+                                                        height: 150,
+                                                      )
+                                                    : Container(
+                                                        height: 150,
+                                                        width: double.infinity,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          border: Border.all(
+                                                            color: state
+                                                                    .hasError
+                                                                ? Colors.red
+                                                                : Colors
+                                                                    .grey, // show red if error
+                                                          ),
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(12),
+                                                        ),
+                                                        child: Column(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .center,
+                                                          children: [
+                                                            Icon(
+                                                                Icons
+                                                                    .cloud_upload_outlined,
+                                                                color: ColorPath
+                                                                    .flushMahogany,
+                                                                size: 32),
+                                                            const SizedBox(
+                                                                height: 8),
+                                                            Text(
+                                                              "Select your file",
+                                                              style: TextStyle(
+                                                                color: Theme.of(context)
+                                                                            .brightness ==
+                                                                        Brightness
+                                                                            .dark
+                                                                    ? Colors
+                                                                        .white
+                                                                    : Colors
+                                                                        .black54,
+                                                              ),
+                                                            ),
+                                                            if (state.hasError)
+                                                              Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .only(
+                                                                        top: 8),
+                                                                child: Text(
+                                                                  state.errorText ??
+                                                                      '',
+                                                                  style: const TextStyle(
+                                                                      color: Colors
+                                                                          .red,
+                                                                      fontSize:
+                                                                          12),
+                                                                ),
+                                                              ),
+                                                          ],
                                                         ),
                                                       ),
-                                                  ],
-                                                ),
-                                              ),
                                       );
                                     },
                                   ),
@@ -599,6 +659,7 @@ class _UpdateRiderProfileAccountState extends State<UpdateRiderProfileAccount> {
                             Padding(
                               padding: const EdgeInsets.only(bottom: 8.0),
                               child: Container(
+                                padding: const EdgeInsets.all(8),
                                 color: Colors.grey.shade100,
                                 child: const Text(
                                   'You’ve already submitted your document. These fields are now locked.',
