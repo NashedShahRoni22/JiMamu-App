@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:get/get.dart';
 import 'package:jimamu/constant/color_path.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../../../../../../../constant/global_typography.dart';
 import '../../../../../../model/order_details.dart';
 import '../../../../../../model/rider_offer_model.dart';
@@ -27,14 +29,15 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
   void initState() {
     if (widget.orderDetails.status != 'pending') {
       acceptedRider = RiderOffer(
-        name: widget.orderDetails.orderAttempts[0].riderBids[0].name,
-        imagePath:
-            widget.orderDetails.orderAttempts[0].riderBids[0].profileImage ??
-                '', // fallback
-        offerAmount: widget.orderDetails.orderAttempts[0].riderBids[0].bidAmount
-            .toDouble(),
-        rating: 4.5,
-      );
+          name: widget.orderDetails.orderAttempts[0].riderBids[0].name,
+          imagePath:
+              widget.orderDetails.orderAttempts[0].riderBids[0].profileImage ??
+                  '', // fallback
+          offerAmount: widget
+              .orderDetails.orderAttempts[0].riderBids[0].bidAmount
+              .toDouble(),
+          rating: 4.5,
+          phone: widget.orderDetails.orderAttempts[0].riderBids[0].phone ?? '');
       widget.orderDetails.orderAttempts[0].riderBids.clear();
     }
     loadLocations();
@@ -199,6 +202,9 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                       ),
                     ),
                     const Divider(),
+                    const SizedBox(
+                      height: 24,
+                    ),
                     if (acceptedRider != null)
                       buildAcceptedRiderStatus()
                     else
@@ -321,11 +327,12 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                         if (success) {
                           setState(() {
                             acceptedRider = RiderOffer(
-                              name: riderBid.name,
-                              imagePath: 'assets/icons/profile.png', // fallback
-                              offerAmount: riderBid.bidAmount.toDouble(),
-                              rating: 4.5,
-                            );
+                                name: riderBid.name,
+                                imagePath:
+                                    'assets/icons/profile.png', // fallback
+                                offerAmount: riderBid.bidAmount.toDouble(),
+                                rating: 4.5,
+                                phone: riderBid.phone);
                             widget.orderDetails.orderAttempts[0].riderBids
                                 .clear();
                           });
@@ -435,17 +442,28 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                   ],
                 ),
               ),
-              Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      color: ColorPath.green300),
-                  child: const Text('Call Now')),
+              GestureDetector(
+                onTap: () async {
+                  String phoneNumber =
+                      acceptedRider!.phone; // Replace with the actual number
+                  if (await canLaunchUrl(Uri.parse('tel:$phoneNumber'))) {
+                    await launchUrl(Uri.parse('tel:$phoneNumber'));
+                  } else {
+                    Get.snackbar("Error", "Could not launch phone app");
+                  }
+                },
+                child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        color: ColorPath.green300),
+                    child: const Text('Call Now')),
+              ),
             ],
           ),
         ),
-        const SizedBox(height: 36),
+        const SizedBox(height: 24),
         // Timeline Steps
         Padding(
           padding: const EdgeInsets.only(left: 32.0),
@@ -467,7 +485,9 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                         child: Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            color: Colors.white60,
+                            color: !isActive
+                                ? Colors.white60
+                                : ColorPath.flushMahogany,
                             borderRadius: BorderRadius.circular(20),
                             boxShadow: [
                               BoxShadow(
@@ -477,7 +497,14 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                               )
                             ],
                           ),
-                          child: Image.asset(iconPath, height: 20),
+                          child: !isActive
+                              ? Image.asset(iconPath, height: 20)
+                              : Icon(
+                                  Icons.done,
+                                  size: 20,
+                                  weight: 10,
+                                  color: ColorPath.white,
+                                ),
                         ),
                       ),
                       if (index != steps.length - 1)

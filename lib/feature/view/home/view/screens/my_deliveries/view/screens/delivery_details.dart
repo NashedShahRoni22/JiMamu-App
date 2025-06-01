@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
+import 'package:get/get.dart';
 import 'package:jimamu/constant/color_path.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../../../../../../../constant/global_typography.dart';
 import '../../../../../model/order_details.dart';
 import '../../../../../model/rider_offer_model.dart';
@@ -16,43 +18,6 @@ class DeliveryDetailsScreen extends StatefulWidget {
 
 class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
   int type = 0;
-
-  List<RiderOffer> riderOffers = [
-    RiderOffer(
-        name: "Azad",
-        imagePath: "assets/icons/profile.png",
-        rating: 4.5,
-        offerAmount: 180),
-    RiderOffer(
-        name: "Shihab",
-        imagePath: "assets/icons/profile2.png",
-        rating: 4.5,
-        offerAmount: 170),
-    RiderOffer(
-        name: "Orbi",
-        imagePath: "assets/icons/profile3.png",
-        rating: 4.5,
-        offerAmount: 180),
-  ];
-
-  RiderOffer? acceptedRider;
-
-  @override
-  void initState() {
-    if (widget.orderDetails.status != 'pending') {
-      acceptedRider = RiderOffer(
-        name: widget.orderDetails.orderAttempts[0].riderBids[0].name,
-        imagePath:
-            widget.orderDetails.orderAttempts[0].riderBids[0].profileImage ??
-                '', // fallback
-        offerAmount: widget.orderDetails.orderAttempts[0].riderBids[0].bidAmount
-            .toDouble(),
-        rating: 4.5,
-      );
-      widget.orderDetails.orderAttempts[0].riderBids.clear();
-    }
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -186,7 +151,7 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
               ),
               const Divider(),
               const SizedBox(
-                height: 16,
+                height: 24,
               ),
               buildAcceptedRiderStatus()
             ],
@@ -250,25 +215,45 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
             children: [
               CircleAvatar(
                 radius: 20,
-                backgroundImage: AssetImage(acceptedRider!.imagePath),
+                child: Text(
+                  widget.orderDetails.sender.name[0].toUpperCase(),
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Mr ${acceptedRider!.name}',
+                    Text('Mr ${widget.orderDetails.sender.name}',
                         style: GlobalTypography.bodyBold),
                     Text('40 trials completed',
                         style: GlobalTypography.bodyRegular),
                   ],
                 ),
               ),
-              Icon(Icons.call, color: ColorPath.flushMahogany),
+              GestureDetector(
+                onTap: () async {
+                  String phoneNumber = widget.orderDetails.sender
+                      .phone; // Replace with the actual number
+                  if (await canLaunchUrl(Uri.parse('tel:$phoneNumber'))) {
+                    await launchUrl(Uri.parse('tel:$phoneNumber'));
+                  } else {
+                    Get.snackbar("Error", "Could not launch phone app");
+                  }
+                },
+                child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        color: ColorPath.green300),
+                    child: const Text('Call Now')),
+              ),
             ],
           ),
         ),
-        const SizedBox(height: 36),
+        const SizedBox(height: 24),
         Padding(
           padding: const EdgeInsets.only(left: 32.0),
           child: Column(
@@ -332,7 +317,9 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                           child: Container(
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
-                              color: Colors.white60,
+                              color: !isActive
+                                  ? Colors.white60
+                                  : ColorPath.flushMahogany,
                               borderRadius: BorderRadius.circular(20),
                               boxShadow: [
                                 BoxShadow(
@@ -342,7 +329,13 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                                 )
                               ],
                             ),
-                            child: Image.asset(iconPath, height: 20),
+                            child: !isActive
+                                ? Image.asset(iconPath, height: 20)
+                                : Icon(
+                                    Icons.done,
+                                    size: 20,
+                                    color: ColorPath.white,
+                                  ),
                           ),
                         ),
                       ),

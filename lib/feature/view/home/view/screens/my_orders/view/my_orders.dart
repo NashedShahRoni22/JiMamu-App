@@ -11,7 +11,8 @@ import '../../../../model/my_order.dart';
 
 class MyOrders extends StatefulWidget {
   static const String id = 'MyOrders';
-  const MyOrders({super.key});
+  final String orderType;
+  const MyOrders({super.key, required this.orderType});
 
   @override
   State<MyOrders> createState() => _MyOrdersState();
@@ -32,7 +33,7 @@ class _MyOrdersState extends State<MyOrders> {
 
   Future<void> _loadOrders() async {
     try {
-      final ongoing = OrderService.fetchMyOngoingOrders();
+      final ongoing = OrderService.fetchMyOngoingOrders(widget.orderType);
       final completed = OrderService.fetchMyCompletedOrders();
 
       final results = await Future.wait([ongoing, completed]);

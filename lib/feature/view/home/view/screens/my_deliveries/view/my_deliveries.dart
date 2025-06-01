@@ -11,7 +11,8 @@ import '../../../../../../../constant/global_typography.dart';
 
 class MyDeliveries extends StatefulWidget {
   static const String id = 'MyDeliveries';
-  const MyDeliveries({super.key});
+  final String orderType;
+  const MyDeliveries({super.key, required this.orderType});
 
   @override
   State<MyDeliveries> createState() => _MyDeliveriesState();
@@ -32,7 +33,8 @@ class _MyDeliveriesState extends State<MyDeliveries> {
 
   Future<void> _loadOrders() async {
     try {
-      final ongoingFuture = OrderService.fetchMyOngoingDelivery();
+      final ongoingFuture =
+          OrderService.fetchMyOngoingDelivery(widget.orderType);
       final completedFuture = OrderService.fetchMyCompletedDelivery();
 
       final results = await Future.wait([

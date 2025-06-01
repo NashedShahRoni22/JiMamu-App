@@ -22,8 +22,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
   String _sessionToken = '';
 
   Future<void> _getPlaceSuggestions(String input) async {
-    const apiKey =
-        'AIzaSyA_L-EJWV8sVrEVWFwLuGxQuJLLCNkt0XE'; // <-- replace with your key
+    const apiKey = 'AIzaSyA_L-EJWV8sVrEVWFwLuGxQuJLLCNkt0XE';
     final url =
         'https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$input&types=geocode&language=en&key=$apiKey&sessiontoken=$_sessionToken';
 

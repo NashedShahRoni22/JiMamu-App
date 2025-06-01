@@ -28,12 +28,12 @@ class OrderService {
         headers: headers, body: jsonEncode(request.toJson()));
   }
 
-  static Future<List<MyOrder>> fetchMyOngoingOrders() async {
+  static Future<List<MyOrder>> fetchMyOngoingOrders(String orderType) async {
     final Box<Token> tokenBox = Hive.box<Token>(LocalString.TOKEN_BOX);
     Token? token = tokenBox.get('token');
 
     final response = await http.get(
-      Uri.parse('${ApiPath.baseUrl}${ApiPath.fetchMyOngoingOrders}'),
+      Uri.parse('${ApiPath.baseUrl}${ApiPath.fetchMyOngoingOrders}$orderType'),
       headers: {
         'Authorization': 'Bearer ${token?.data?.token}',
       },
@@ -93,12 +93,13 @@ class OrderService {
     return null;
   }
 
-  static Future<List<DeliveryRequest>> fetchDeliveryRequests() async {
+  static Future<List<DeliveryRequest>> fetchDeliveryRequests(
+      String orderType) async {
     final Box<Token> tokenBox = Hive.box<Token>(LocalString.TOKEN_BOX);
     final Token? token = tokenBox.get('token');
 
     final response = await http.get(
-      Uri.parse('${ApiPath.baseUrl}${ApiPath.riderNewOrderRequest}'),
+      Uri.parse('${ApiPath.baseUrl}${ApiPath.riderNewOrderRequest}$orderType'),
       headers: {
         'Authorization': 'Bearer ${token?.data?.token}',
       },
@@ -217,12 +218,14 @@ class OrderService {
     return false;
   }
 
-  static Future<List<MyDeliveriesModel>> fetchMyOngoingDelivery() async {
+  static Future<List<MyDeliveriesModel>> fetchMyOngoingDelivery(
+      String orderType) async {
     final Box<Token> tokenBox = Hive.box<Token>(LocalString.TOKEN_BOX);
     Token? token = tokenBox.get('token');
 
     final response = await http.get(
-      Uri.parse('${ApiPath.baseUrl}${ApiPath.fetchMyOngoingDelivery}'),
+      Uri.parse(
+          '${ApiPath.baseUrl}${ApiPath.fetchMyOngoingDelivery}$orderType'),
       headers: {
         'Authorization': 'Bearer ${token?.data?.token}',
       },

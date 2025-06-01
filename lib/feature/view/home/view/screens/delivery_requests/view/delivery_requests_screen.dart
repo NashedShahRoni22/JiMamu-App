@@ -7,7 +7,8 @@ import '../models/delivery_request.dart';
 
 class DeliveryRequestsScreen extends StatefulWidget {
   static const String id = 'DeliveryRequestsScreen';
-  const DeliveryRequestsScreen({super.key});
+  final String orderType;
+  const DeliveryRequestsScreen({super.key, required this.orderType});
 
   @override
   State<DeliveryRequestsScreen> createState() => _DeliveryRequestsScreenState();
@@ -24,7 +25,7 @@ class _DeliveryRequestsScreenState extends State<DeliveryRequestsScreen> {
       setState(() {
         isLoading = true;
       });
-      final data = await OrderService.fetchDeliveryRequests();
+      final data = await OrderService.fetchDeliveryRequests(widget.orderType);
       setState(() {
         deliveryRequests = data;
         isLoading = false;
@@ -50,23 +51,27 @@ class _DeliveryRequestsScreenState extends State<DeliveryRequestsScreen> {
               child: CircularProgressIndicator(
               color: ColorPath.flushMahogany,
             ))
-          : ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: deliveryRequests.length,
-              itemBuilder: (context, index) {
-                final request = deliveryRequests[index];
-                final attempt = request.orderAttempts[0];
-                return RequestCard(
-                  orderId: request.orderId,
-                  date: request.date,
-                  from:
-                      'Lat: ${request.pickupLatitude}, Long: ${request.pickupLongitude}',
-                  to: 'Lat: ${request.dropLatitude}, Long: ${request.dropLongitude}',
-                  bid: attempt.fare,
-                  onPressed: () {},
-                );
-              },
-            ),
+          : deliveryRequests.isEmpty
+              ? const Center(
+                  child: Text("There are no available order requests now. "),
+                )
+              : ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: deliveryRequests.length,
+                  itemBuilder: (context, index) {
+                    final request = deliveryRequests[index];
+                    final attempt = request.orderAttempts[0];
+                    return RequestCard(
+                      orderId: request.orderId,
+                      date: request.date,
+                      fromLat: request.pickupLatitude,
+                      fromLong: request.pickupLongitude,
+                      toLat: request.dropLatitude,
+                      toLong: request.dropLongitude,
+                      bid: attempt.fare,
+                    );
+                  },
+                ),
     );
   }
 }

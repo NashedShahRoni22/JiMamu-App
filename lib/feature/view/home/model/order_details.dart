@@ -7,6 +7,7 @@ class OrderDetails {
   final double dropLat;
   final double dropLng;
   final ReceiverInfo receiver;
+  final ReceiverInfo sender;
   final List<OrderAttempt> orderAttempts;
 
   OrderDetails({
@@ -18,6 +19,7 @@ class OrderDetails {
     required this.dropLat,
     required this.dropLng,
     required this.receiver,
+    required this.sender,
     required this.orderAttempts,
   });
 
@@ -31,6 +33,7 @@ class OrderDetails {
       dropLat: double.tryParse(json['drop_latitude']) ?? 0.0,
       dropLng: double.tryParse(json['drop_longitude']) ?? 0.0,
       receiver: ReceiverInfo.fromJson(json['receiver_information']),
+      sender: ReceiverInfo.fromJson(json['sender_information']),
       orderAttempts: (json['order_attempts'] as List)
           .map((e) => OrderAttempt.fromJson(e))
           .toList(),
@@ -88,13 +91,14 @@ class RiderBid {
   final String name;
   final String? profileImage;
   final int bidAmount;
+  final String phone;
 
-  RiderBid({
-    required this.riderId,
-    required this.name,
-    required this.profileImage,
-    required this.bidAmount,
-  });
+  RiderBid(
+      {required this.riderId,
+      required this.name,
+      required this.profileImage,
+      required this.bidAmount,
+      required this.phone});
 
   factory RiderBid.fromJson(Map<String, dynamic> json) {
     return RiderBid(
@@ -102,6 +106,7 @@ class RiderBid {
       name: json['name'],
       profileImage: json['profile_image'],
       bidAmount: json['bid_amount'],
+      phone: json['phone_number'],
     );
   }
 }

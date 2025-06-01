@@ -3,12 +3,13 @@ import 'package:get/get.dart';
 import 'package:jimamu/feature/controller/user_controller.dart';
 import 'package:jimamu/feature/view/account/view/screens/update_rider_profile_screen.dart';
 import 'package:jimamu/feature/view/home/view/screens/my_deliveries/view/my_deliveries.dart';
+import 'package:jimamu/feature/view/home/view/screens/my_orders/view/choose_order_type_screen_my_orders.dart';
 import 'package:jimamu/feature/view/home/view/screens/place_order/view/choose_order_type_screen.dart';
 
 import '../../../../../constant/color_path.dart';
 import '../../../../../constant/global_typography.dart';
-import '../screens/delivery_requests/view/delivery_requests_screen.dart';
-import '../screens/my_orders/view/my_orders.dart';
+import '../screens/delivery_requests/view/choose_order_type_screen_delivery_requests.dart';
+import '../screens/my_deliveries/view/choose_order_type_screen_my_deliveries.dart';
 
 class ServicesGrid extends StatefulWidget {
   final List<Map<String, String>> services;
@@ -29,7 +30,7 @@ class _ServicesGridState extends State<ServicesGrid> {
         return InkWell(
           onTap: () {
             if (service['title']! == 'My Orders') {
-              Get.to(const MyOrders());
+              Get.to(const ChooseOrderTypeScreenMyOrders());
             } else if (service['title']! == 'Place Order') {
               Get.to(const ChooseOrderTypeScreen());
             } else if (service['title']! == 'Delivery Requests') {
@@ -39,7 +40,7 @@ class _ServicesGridState extends State<ServicesGrid> {
               if (!roles.contains('rider')) {
                 // Wait for frame to finish building
                 WidgetsBinding.instance.addPostFrameCallback((_) {
-                  Get.to(UpdateRiderProfileAccount());
+                  Get.to(const UpdateRiderProfileAccount());
 
                   // Optionally show a snackbar or dialog briefly
                   Get.snackbar(
@@ -52,7 +53,7 @@ class _ServicesGridState extends State<ServicesGrid> {
                 });
                 return;
               }
-              Get.to(const DeliveryRequestsScreen());
+              Get.to(const ChooseOrderTypeScreenDeliveryRequests());
             } else if (service['title']! == 'My Deliveries') {
               final UserController userController = Get.put(UserController());
               final roles = userController.riderProfile.data?.role ?? [];
@@ -60,7 +61,7 @@ class _ServicesGridState extends State<ServicesGrid> {
               if (!roles.contains('rider')) {
                 // Wait for frame to finish building
                 WidgetsBinding.instance.addPostFrameCallback((_) {
-                  Get.to(UpdateRiderProfileAccount());
+                  Get.to(const UpdateRiderProfileAccount());
 
                   // Optionally show a snackbar or dialog briefly
                   Get.snackbar(
@@ -73,7 +74,7 @@ class _ServicesGridState extends State<ServicesGrid> {
                 });
                 return;
               }
-              Get.to(const MyDeliveries());
+              Get.to(const ChooseOrderTypeScreenMyDeliveries());
             }
           },
           child: SizedBox(

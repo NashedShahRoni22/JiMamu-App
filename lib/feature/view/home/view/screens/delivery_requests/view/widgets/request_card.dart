@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:jimamu/constant/color_path.dart';
 
 import '../../../../../../../../constant/global_typography.dart';
@@ -9,19 +11,21 @@ import '../../../my_orders/view/widgets/measure_size.dart';
 class RequestCard extends StatefulWidget {
   final String orderId;
   final String date;
-  final String from;
-  final String to;
+  final String fromLat;
+  final String fromLong;
+  final String toLat;
+  final String toLong;
   final int bid;
-  final VoidCallback onPressed;
 
   const RequestCard({
     super.key,
     required this.orderId,
     required this.date,
-    required this.from,
-    required this.to,
+    required this.fromLat,
+    required this.fromLong,
+    required this.toLat,
+    required this.toLong,
     required this.bid,
-    required this.onPressed,
   });
 
   @override
@@ -31,60 +35,88 @@ class RequestCard extends StatefulWidget {
 class _RequestCardState extends State<RequestCard> {
   double _addressHeight = 0;
   int _currentBid = 0;
+  String? pickupLocation;
+  String? dropoffLocation;
+
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
     _currentBid = widget.bid;
+    loadLocations();
+  }
+
+  void loadLocations() async {
+    List<Placemark> placemarks = await placemarkFromCoordinates(
+      double.parse(widget.fromLat),
+      double.parse(widget.fromLong),
+    );
+    final place = placemarks.first;
+    pickupLocation =
+        "${place.name}, ${place.street}, ${place.locality}, ${place.administrativeArea}, ${place.postalCode}, ${place.country}";
+    placemarks = await placemarkFromCoordinates(
+      double.parse(widget.toLat),
+      double.parse(widget.toLong),
+    );
+    final place2 = placemarks.first;
+    dropoffLocation =
+        "${place2.name}, ${place2.street}, ${place2.locality}, ${place2.administrativeArea}, ${place2.postalCode}, ${place2.country}";
+    setState(() {
+      isLoading = false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(width: 1, color: ColorPath.white100),
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return isLoading
+        ? Padding(
+            padding:
+                EdgeInsets.only(top: MediaQuery.of(context).size.height / 3),
+            child: Center(
+              child: CircularProgressIndicator(
+                color: ColorPath.flushMahogany,
+              ),
+            ),
+          )
+        : Stack(
             children: [
               Container(
-                padding: const EdgeInsets.all(10),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: ColorPath.secondary,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(width: 1, color: ColorPath.white100),
                 ),
-                child: Image.asset('assets/icons/package.png'),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
+                child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildHeaderRow(),
-                    const SizedBox(height: 16),
-                    _buildAddressSection(),
-                    const SizedBox(height: 20),
-                    _buildFareRow(),
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: ColorPath.secondary,
+                      ),
+                      child: Image.asset('assets/icons/package.png'),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildHeaderRow(),
+                          const SizedBox(height: 16),
+                          _buildAddressSection(),
+                          const SizedBox(height: 20),
+                          _buildFareRow(),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
             ],
-          ),
-        ),
-        Positioned(
-          right: 8,
-          top: 4,
-          child: IconButton(
-            onPressed: widget.onPressed,
-            icon: Icon(Icons.arrow_forward_ios, color: ColorPath.black500),
-          ),
-        ),
-      ],
-    );
+          );
   }
 
   Widget _buildHeaderRow() {
@@ -126,11 +158,17 @@ class _RequestCardState extends State<RequestCard> {
             children: [
               Text('From', style: GlobalTypography.bodyMedium),
               const SizedBox(height: 4),
-              Text(widget.from, style: GlobalTypography.pRegular),
+              SizedBox(
+                  width: MediaQuery.of(context).size.width / 2,
+                  child:
+                      Text(pickupLocation!, style: GlobalTypography.pRegular)),
               const SizedBox(height: 16),
               Text('To', style: GlobalTypography.bodyMedium),
               const SizedBox(height: 4),
-              Text(widget.to, style: GlobalTypography.pRegular),
+              SizedBox(
+                  width: MediaQuery.of(context).size.width / 2,
+                  child:
+                      Text(dropoffLocation!, style: GlobalTypography.pRegular)),
             ],
           ),
         ),
